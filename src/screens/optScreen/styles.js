@@ -1,10 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {COLORS} from '../../constants/theme';
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: COLORS.primary_black,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 40,
@@ -22,10 +22,11 @@ export const styles = StyleSheet.create({
   },
   numberInput: {
     backgroundColor: 'transparent',
-    color: COLORS.white,
-    padding: 8,
+    color: COLORS.black,
+    // padding: 8,
     width: 30,
     fontSize: 20,
+    marginVertical: 6
   },
   headerText: {
     color: COLORS.green_100,
@@ -33,9 +34,19 @@ export const styles = StyleSheet.create({
   },
   mutedText: {
     color: COLORS.gray,
-    opacity: 0.7,
   },
   seperator: {
     marginHorizontal: 10,
   },
+  textSection: {
+    paddingHorizontal: 45,
+  },
+  normalText: {
+    flexDirection: 'row',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontSize: 14,
+    gap: 20,
+  },
+
 });

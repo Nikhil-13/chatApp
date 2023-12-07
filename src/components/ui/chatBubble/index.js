@@ -1,19 +1,24 @@
-import {View, Text} from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import React from 'react';
-import {COLORS} from '../../../constants/theme';
-import {styles} from './styles';
+import { COLORS } from '../../../constants/theme';
+import { styles } from './styles';
 
-const ChatBubble = ({dir}) => {
+const ChatBubble = ({ dir, onLongPress }) => {
   const alignDirection = dir === 'left' ? 'flex-start' : 'flex-end';
   const bubbleColor = dir === 'left' ? COLORS.green_400 : COLORS.green_200;
+
+  function longPressHandler({ nativeEvent }) {
+    onLongPress(nativeEvent?.timestamp)
+  }
+
   return (
-    <View
+    <Pressable onLongPress={longPressHandler}
       style={[
         styles.rootContainer,
-        {alignSelf: alignDirection, backgroundColor: bubbleColor},
+        { alignSelf: alignDirection, backgroundColor: bubbleColor },
       ]}>
       <Text style={styles.chatText}>ChatBubble</Text>
-    </View>
+    </Pressable>
   );
 };
 

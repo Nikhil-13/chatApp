@@ -1,5 +1,5 @@
-import {StyleSheet} from 'react-native';
-import {COLORS} from '../../../constants/theme';
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
@@ -11,9 +11,10 @@ export const styles = StyleSheet.create({
   },
   textInput: {
     paddingHorizontal: 6,
-    paddingVertical: 3,
     fontSize: 16,
     color: COLORS.white,
-    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: "100%"
   },
 });

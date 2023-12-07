@@ -1,12 +1,12 @@
-import {View, Text, TextInput, Alert} from 'react-native';
-import React, {useState} from 'react';
-import {COLORS} from '../../constants/theme';
-import {styles} from './styles';
-import {extractDigits, validateNumber} from '../../util/helper';
+import { View, Text, TextInput, Alert, SafeAreaView, StatusBar } from 'react-native';
+import React, { useState } from 'react';
+import { COLORS } from '../../constants/theme';
+import { styles } from './styles';
+import { extractDigits, validateNumber, formatNumber } from '../../util/helper';
 import PrimaryButton from '../../components/ui/primaryButton';
 import FlatButton from '../../components/ui/flatButton';
 
-const LoginScreen = ({navigation, route}) => {
+const LoginScreen = ({ navigation, route }) => {
   const [contactNumber, setContactNumber] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -16,18 +16,19 @@ const LoginScreen = ({navigation, route}) => {
   }
 
   function getOtpHandler() {
-    if (validateNumber(contactNumber) || contactNumber.length === '') {
+    if (contactNumber.length === '') {
       Alert.alert(
         'Invalid Phone Number',
         'Please provide a valid phone number.',
       );
     } else {
-      navigation.navigate('OtpScreen', {number: contactNumber});
+      navigation.navigate('OtpScreen', { number: contactNumber });
     }
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaView style={styles.rootContainer}>
+      <StatusBar barStyle={'dark-content'} backgroundColor={COLORS.white} />
       <View style={styles.detailSection}>
         <Text style={styles.headerText}>Enter your phone number</Text>
         <View style={styles.textSection}>
@@ -40,17 +41,21 @@ const LoginScreen = ({navigation, route}) => {
             color={COLORS.green_200}
           />
         </View>
+        <View style={styles.countryPickerContainer}>
+          <Text style={[styles.normalText, styles.countryPicker]}>India</Text>
+        </View>
         <View style={styles.numberInputContainer}>
-          <Text style={styles.mutedText}>+91</Text>
+          <View style={styles.countryCodeContainer}>
+            <Text style={styles.mutedText}>+</Text>
+            <TextInput style={styles.countryCodeInput} defaultValue='91' maxLength={2} editable={false} />
+          </View>
           <TextInput
-            style={[styles.numberInput, isFocused && {borderBottomWidth: 2}]}
+            style={[styles.numberInput, isFocused && { borderBottomWidth: 2 }]}
             onChangeText={numberHandler}
             keyboardType="number-pad"
-            maxLength={10}
-            minLength={10}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            value={contactNumber}
+            value={formatNumber(contactNumber)}
             placeholder="Phone Number"
           />
         </View>
@@ -59,11 +64,11 @@ const LoginScreen = ({navigation, route}) => {
         </Text>
       </View>
       <PrimaryButton
-        title={'Get OTP'}
+        title={'Next'}
         color={COLORS.green_200}
         onPress={getOtpHandler}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

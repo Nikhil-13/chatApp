@@ -15,3 +15,8 @@ export function formatNumber(value) {
     value.slice(0, 4) + ' ' + value.slice(4, 7) + ' ' + value.slice(7, 10);
   return formatted;
 }
+export function formattedNumber(value) {
+  const formatted =
+    value.slice(0, 5) + ' ' + value.slice(5, 10);
+  return formatted;
+}

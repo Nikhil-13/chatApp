@@ -1,29 +1,54 @@
-import {StyleSheet} from 'react-native';
-import {COLORS} from '../../constants/theme';
+import { StyleSheet, Platform } from 'react-native';
+import { COLORS } from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: COLORS.primary_black,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 20,
   },
   detailSection: {
+    width: '100%',
     alignItems: 'center',
     gap: 20,
   },
-  textSection: {flexDirection: 'row', alignItems: 'center', gap: 5},
+  textSection: {
+    flexDirection: Platform.select({ ios: 'column', android: 'row' }),
+    alignItems: 'center', gap: 5
+  },
   numberInputContainer: {
     width: '50%',
     gap: 5,
     flexDirection: 'row',
     alignItems: 'center',
   },
+  countryPickerContainer: {
+    borderBottomWidth: 1,
+    borderColor: COLORS.green_200,
+  },
+
+  countryCodeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  countryCodeInput: {
+    backgroundColor: 'transparent',
+    color: COLORS.black,
+    padding: 4,
+    borderBottomWidth: 1,
+    borderColor: COLORS.green_200,
+  },
+  countryPicker: {
+    padding: 4, width: 150
+    , textAlign: 'center',
+
+  },
   numberInput: {
     flex: 1,
     backgroundColor: 'transparent',
-    color: COLORS.white,
+    color: COLORS.black,
     padding: 4,
     borderBottomWidth: 1,
     borderColor: COLORS.green_200,
@@ -34,10 +59,10 @@ export const styles = StyleSheet.create({
   },
   mutedText: {
     color: COLORS.gray,
-    opacity: 0.7,
+    fontSize: 14,
   },
   normalText: {
-    color: COLORS.white,
+    color: COLORS.black,
     fontSize: 14,
   },
 });

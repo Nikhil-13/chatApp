@@ -1,8 +1,10 @@
-import {StyleSheet} from 'react-native';
-import {COLORS} from '../../constants/theme';
+import { StyleSheet, Platform } from 'react-native';
+import { COLORS } from '../../constants/theme';
+
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
+    paddingBottom: Platform.select({ ios: 20 }),
     backgroundColor: COLORS.primary_black,
   },
   chatContainer: {
@@ -16,4 +18,20 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  textSection: {
+    flexDirection: Platform.select({ ios: 'column', android: 'row' }),
+    alignItems: 'center', gap: 5
+  },
+  sendButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.green_200,
+    height: 45,
+    width: 45,
+    borderRadius: 50,
+    elevation: 4,
+    shadowColor: COLORS.black,
+    shadowOffset: { height: 1, width: 1 },
+    shadowOpacity: .7
+  }
 });
