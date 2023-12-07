@@ -22,10 +22,10 @@ const OtpScreen = ({ navigation, route }) => {
     if (otp.length === 6) {
       submitHandler()
     }
+
   }, [otp])
 
   function digitInputHandler(nextElement, value) {
-
     if (nextElement && value !== '') {
       nextElement.current.focus();
     }
@@ -36,7 +36,7 @@ const OtpScreen = ({ navigation, route }) => {
   function backpressHandler(nativeEvent, prevElement, index) {
     if (nativeEvent.key === 'Backspace' && prevElement !== '') {
       if (otp.length !== 0) {
-        setOtp(otp => otp.slice(0, -1));
+        setOtp(otp => otp.slice(0, index));
         prevElement.current.focus()
       }
     }
@@ -66,6 +66,8 @@ const OtpScreen = ({ navigation, route }) => {
         <View style={styles.textSection}>
           <Text style={styles.normalText}>
             Whatsapp will read sms automatically sent to{' '}
+          </Text>
+          <View style={{ flexDirection: 'row', alignSelf: 'center' }}>
             <Text style={[styles.normalText, { fontWeight: 'bold' }]}>
               +91 {formattedNumber(contactNumber)}{' '}
             </Text>
@@ -75,7 +77,7 @@ const OtpScreen = ({ navigation, route }) => {
               color={'blue'}
               onPress={navigateBack}
             />
-          </Text>
+          </View>
         </View>
         <View style={styles.numberInputContainer}>
           <TextInput
@@ -149,6 +151,7 @@ const OtpScreen = ({ navigation, route }) => {
         </View>
         <Text style={styles.mutedText}>Enter 6-digit code</Text>
         <FlatButton title={`Didn't receive code?`} color={COLORS.green_200} />
+        <IconButton name={'close'} color={COLORS.gray} size={24} style={{ position: 'absolute', left: 15, }} onPress={navigateBack} />
       </View>
     </SafeAreaView>
   );

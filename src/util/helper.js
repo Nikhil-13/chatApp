@@ -10,6 +10,7 @@ export function extractDigits(inputString) {
 export function validateNumber(value) {
   return value.length !== 10;
 }
+
 export function formatNumber(value) {
   const formatted =
     value.slice(0, 4) + ' ' + value.slice(4, 7) + ' ' + value.slice(7, 10);

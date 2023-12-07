@@ -26,6 +26,7 @@ const LoginScreen = ({ navigation, route }) => {
     }
   }
 
+
   return (
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar barStyle={'dark-content'} backgroundColor={COLORS.white} />
@@ -53,10 +54,12 @@ const LoginScreen = ({ navigation, route }) => {
             style={[styles.numberInput, isFocused && { borderBottomWidth: 2 }]}
             onChangeText={numberHandler}
             keyboardType="number-pad"
+            maxLength={10}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            value={formatNumber(contactNumber)}
+            value={(contactNumber !== '' && contactNumber?.length === 10) ? formatNumber(contactNumber) : contactNumber}
             placeholder="Phone Number"
+            placeholderTextColor={COLORS.gray}
           />
         </View>
         <Text style={styles.mutedText}>

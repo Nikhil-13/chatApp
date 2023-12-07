@@ -15,16 +15,17 @@ export const styles = StyleSheet.create({
   },
   numberInputContainer: {
     flexDirection: 'row',
-    gap: 5,
+    justifyContent: 'center',
+    paddingHorizontal: 15,
     alignItems: 'center',
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderColor: COLORS.green_200,
   },
   numberInput: {
     backgroundColor: 'transparent',
     color: COLORS.black,
     // padding: 8,
-    width: 30,
+    width: 20,
     fontSize: 20,
     marginVertical: 6
   },
@@ -36,7 +37,7 @@ export const styles = StyleSheet.create({
     color: COLORS.gray,
   },
   seperator: {
-    marginHorizontal: 10,
+    marginHorizontal: 2,
   },
   textSection: {
     paddingHorizontal: 45,

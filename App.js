@@ -59,7 +59,9 @@ const App = () => {
           }}
         />
         <Stack.Screen name="ChatScreen" component={ChatScreen} />
-        <Stack.Screen name="NewChatScreen" component={NewChat} />
+        <Stack.Screen name="NewChatScreen" component={NewChat} options={{
+          headerRight: ({ tintColor }) => <IconButton name={'dots-vertical'} color={tintColor} size={24} />,
+        }} />
       </Stack.Navigator>
     );
   }
