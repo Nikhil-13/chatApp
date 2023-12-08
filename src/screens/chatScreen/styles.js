@@ -1,10 +1,10 @@
-import { StyleSheet, Platform } from 'react-native';
-import { COLORS } from '../../constants/theme';
+import {StyleSheet, Platform} from 'react-native';
+import {COLORS} from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    paddingBottom: Platform.select({ ios: 20 }),
+    paddingBottom: Platform.select({ios: 20}),
     backgroundColor: COLORS.primary_black,
   },
   chatContainer: {
@@ -19,8 +19,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   textSection: {
-    flexDirection: Platform.select({ ios: 'column', android: 'row' }),
-    alignItems: 'center', gap: 5
+    flexDirection: Platform.select({ios: 'column', android: 'row'}),
+    alignItems: 'center',
+    gap: 5,
   },
   sendButton: {
     justifyContent: 'center',
@@ -31,7 +32,21 @@ export const styles = StyleSheet.create({
     borderRadius: 50,
     elevation: 4,
     shadowColor: COLORS.black,
-    shadowOffset: { height: 1, width: 1 },
-    shadowOpacity: .7
-  }
+    shadowOffset: {height: 1, width: 1},
+    shadowOpacity: 0.7,
+  },
+  avatarImage: {
+    height: 30,
+    width: 30,
+    borderRadius: 40,
+    objectFit: 'cover',
+  },
+  fullHeight: {
+    height: '100%',
+  },
+  leftHeaderStyles: {flexDirection: 'row', alignItems: 'center', gap: 4},
+  rightHeader: {
+    flexDirection: 'row',
+    gap: 10,
+  },
 });

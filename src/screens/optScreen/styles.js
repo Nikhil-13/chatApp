@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/theme';
+import {StyleSheet} from 'react-native';
+import {COLORS} from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
@@ -24,10 +24,9 @@ export const styles = StyleSheet.create({
   numberInput: {
     backgroundColor: 'transparent',
     color: COLORS.black,
-    // padding: 8,
     width: 20,
     fontSize: 20,
-    marginVertical: 6
+    marginVertical: 6,
   },
   headerText: {
     color: COLORS.green_100,
@@ -49,5 +48,4 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     gap: 20,
   },
-
 });

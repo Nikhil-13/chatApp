@@ -17,7 +17,12 @@ export function formatNumber(value) {
   return formatted;
 }
 export function formattedNumber(value) {
-  const formatted =
-    value.slice(0, 5) + ' ' + value.slice(5, 10);
+  const formatted = value.slice(0, 5) + ' ' + value.slice(5, 10);
   return formatted;
+}
+
+export function removeNonAlphabeticCharacters(inputString) {
+  var regex = /[^a-zA-Z\s]/g;
+  var cleanedString = inputString.replace(regex, '');
+  return cleanedString;
 }

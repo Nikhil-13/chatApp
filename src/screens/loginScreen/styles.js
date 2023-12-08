@@ -1,5 +1,5 @@
-import { StyleSheet, Platform } from 'react-native';
-import { COLORS } from '../../constants/theme';
+import {StyleSheet, Platform} from 'react-native';
+import {COLORS} from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
@@ -12,11 +12,12 @@ export const styles = StyleSheet.create({
   detailSection: {
     width: '100%',
     alignItems: 'center',
-    gap: 20,
+    gap: 15,
   },
   textSection: {
-    flexDirection: Platform.select({ ios: 'column', android: 'row' }),
-    alignItems: 'center', gap: 5
+    flexDirection: Platform.select({ios: 'column', android: 'row'}),
+    alignItems: 'center',
+    gap: 5,
   },
   numberInputContainer: {
     width: '50%',
@@ -31,7 +32,7 @@ export const styles = StyleSheet.create({
 
   countryCodeContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   countryCodeInput: {
     backgroundColor: 'transparent',
@@ -41,9 +42,15 @@ export const styles = StyleSheet.create({
     borderColor: COLORS.green_200,
   },
   countryPicker: {
-    padding: 4, width: 150
-    , textAlign: 'center',
-
+    padding: 4,
+    width: 150,
+    textAlign: 'center',
+  },
+  nameInputContainer: {
+    width: 150,
+    padding: 4,
+    borderBottomWidth: 1,
+    borderColor: COLORS.green_200,
   },
   numberInput: {
     flex: 1,

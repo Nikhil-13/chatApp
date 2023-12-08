@@ -57,6 +57,7 @@
 	<array>
 		<string>Ionicons.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
+		<string>FontAwesome.ttf</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

@@ -40,6 +40,7 @@
 		310051552B219D2E00D11A13 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		313458832B21FF8F00606EE4 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		3142BF2C2B21F94800B3391A /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		31E2B8632B2314BB004DFB92 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-chatApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chatApp.debug.xcconfig"; path = "Target Support Files/Pods-chatApp/Pods-chatApp.debug.xcconfig"; sourceTree = "<group>"; };
 		4CD2AB158E1B85702B7972E7 /* Pods-chatAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chatAppTests.debug.xcconfig"; path = "Target Support Files/Pods-chatAppTests/Pods-chatAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4E0A072A7F01E3DA440872ED /* Pods_chatApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_chatApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,6 +117,7 @@
 		3142BF2B2B21F8A200B3391A /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
+				31E2B8632B2314BB004DFB92 /* FontAwesome.ttf */,
 				313458832B21FF8F00606EE4 /* MaterialCommunityIcons.ttf */,
 				3142BF2C2B21F94800B3391A /* Ionicons.ttf */,
 			);
