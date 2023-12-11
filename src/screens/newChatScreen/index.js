@@ -1,11 +1,13 @@
 import {View, Text, ScrollView, FlatList} from 'react-native';
-import React, {useLayoutEffect} from 'react';
+import React, {useContext, useLayoutEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {styles} from './styles';
 import ContactCard from '../../components/ui/contactCard';
 import IconButton from '../../components/ui/iconButton';
+import AuthContext from '../../store/context/authContext';
 
 const NewChat = ({navigation, route}) => {
+  const {token} = useContext(AuthContext);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
@@ -14,11 +16,18 @@ const NewChat = ({navigation, route}) => {
   });
 
   const users = useSelector(state => state.user.users);
-  const usersCount = users.length;
+  const userId = users.filter(user => user.number === token)[0];
+  const userChatList = users.filter(user => user.number === token)[0]?.chats;
+  const everyOneElse = users.filter(
+    user => user.number !== route.params.userNumber,
+  );
 
-  console.log(users);
-  function startChatHandler() {
-    navigation.navigate('ChatScreen');
+  const usersCount = everyOneElse.length;
+
+  function startChatHandler(item) {
+    console.log(userChatList);
+    // const newObj = {name: 'rajehhs', number: item[0], chats: item[1]};
+    // navigation.navigate('ChatScreen', {data: newObj});
   }
 
   function LeftHeader({color}) {
@@ -54,17 +63,20 @@ const NewChat = ({navigation, route}) => {
 
   return (
     <View style={styles.rootContainer}>
-      <FlatList
-        alwaysBounceVertical={true}
-        data={users}
-        renderItem={({itemData}) => (
-          <ContactCard
-            avatar={
-              'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png'
-            }
-            onPress={startChatHandler}
-          />
-        )}></FlatList>
+      {users.length === 0 ? (
+        <Text style={styles.noContacts}>No Contacts</Text>
+      ) : (
+        <FlatList
+          alwaysBounceVertical={true}
+          data={everyOneElse}
+          renderItem={({item}) => (
+            <ContactCard
+              data={item}
+              onPress={() => startChatHandler(everyOneElse)}
+            />
+          )}
+        />
+      )}
     </View>
   );
 };

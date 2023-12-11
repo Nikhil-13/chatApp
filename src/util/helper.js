@@ -26,3 +26,14 @@ export function removeNonAlphabeticCharacters(inputString) {
   var cleanedString = inputString.replace(regex, '');
   return cleanedString;
 }
+
+export function getInitials(name) {
+  const words = name.split(' ');
+  let initials = '';
+  for (let i = 0; i < Math.min(2, words.length); i++) {
+    if (words[i].length > 0) {
+      initials += words[i][0].toUpperCase();
+    }
+  }
+  return initials;
+}

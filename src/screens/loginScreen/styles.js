@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
   },
   nameInputContainer: {
     width: 150,
-    padding: 4,
+    padding: Platform.select({ios: 4, android: 0}),
     borderBottomWidth: 1,
     borderColor: COLORS.green_200,
   },
@@ -71,5 +71,10 @@ export const styles = StyleSheet.create({
   normalText: {
     color: COLORS.black,
     fontSize: 14,
+  },
+  nameInput: {
+    textAlign: 'center',
+    color: COLORS.black,
+    padding: 0,
   },
 });

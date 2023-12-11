@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: Platform.select({ios: 20}),
     backgroundColor: COLORS.primary_black,
+    justifyContent: 'space-between',
   },
   chatContainer: {
     flex: 1,
@@ -36,10 +37,13 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.7,
   },
   avatarImage: {
-    height: 30,
-    width: 30,
+    height: 35,
+    width: 35,
     borderRadius: 40,
     objectFit: 'cover',
+    backgroundColor: COLORS.gray,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   fullHeight: {
     height: '100%',
@@ -49,4 +53,5 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+  initials: {color: COLORS.black, fontSize: 18},
 });

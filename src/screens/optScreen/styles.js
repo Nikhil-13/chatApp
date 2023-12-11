@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 import {COLORS} from '../../constants/theme';
 
 export const styles = StyleSheet.create({
@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 40,
+    paddingVertical: Platform.select({ios: 40, android: 20}),
   },
   detailSection: {
     gap: 20,
@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     color: COLORS.black,
     width: 20,
     fontSize: 20,
-    marginVertical: 6,
+    marginVertical: Platform.select({ios: 6}),
   },
   headerText: {
     color: COLORS.green_100,
@@ -47,5 +47,11 @@ export const styles = StyleSheet.create({
     color: COLORS.black,
     fontSize: 14,
     gap: 20,
+  },
+  cancelButton: {
+    position: 'absolute',
+
+    top: Platform.select({ios: 1, android: 2}),
+    left: Platform.select({ios: 15, android: 0}),
   },
 });

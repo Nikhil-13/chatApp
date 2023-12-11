@@ -1,18 +1,34 @@
-import {View, ScrollView, Text, Image} from 'react-native';
-import {useState, useEffect, useLayoutEffect} from 'react';
+import {View, ScrollView, Text, Image, FlatList} from 'react-native';
+import {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
 import IconButton from '../../components/ui/iconButton';
+import {useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {styles} from './styles';
 import {COLORS} from '../../constants/theme';
+import {getInitials} from '../../util/helper';
+import database from '@react-native-firebase/database';
+import AuthContext from '../../store/context/authContext';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState();
+  const [textMessage, setTextMessage] = useState();
+  const {token} = useContext(AuthContext);
+
   useEffect(() => {
     if (!!selectedMessage) {
       navigation.setOptions({
         headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
+        headerLeft: ({tintColor}) => (
+          <IconButton
+            name="arrow-left"
+            size={24}
+            color={tintColor}
+            onPress={() => setSelectedMessage(false)}
+            style={styles.fullHeight}
+          />
+        ),
       });
     }
   }, [selectedMessage]);
@@ -20,8 +36,13 @@ const ChatScreen = ({navigation, route}) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
+      headerRight: () => {},
     });
   });
+
+  const userData = route.params?.data;
+  console.log(userData);
+  const chatsArray = Object.entries(userData?.chats).reverse();
 
   function LeftHeader({color}) {
     return (
@@ -33,13 +54,10 @@ const ChatScreen = ({navigation, route}) => {
           onPress={() => navigation.goBack()}
           style={styles.fullHeight}
         />
-        <Image
-          source={{
-            uri: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png',
-          }}
-          style={styles.avatarImage}
-        />
-        <Text style={{color: color, fontSize: 18}}>abv</Text>
+        <View style={styles.avatarImage}>
+          <Text style={styles.initials}>{getInitials(userData.name)}</Text>
+        </View>
+        <Text style={{color: color, fontSize: 18}}>{userData.name}</Text>
       </View>
     );
   }
@@ -53,33 +71,49 @@ const ChatScreen = ({navigation, route}) => {
     );
   }
 
+  async function sendMessage() {
+    const messageObj = {
+      recepientName: userData.name,
+      recepientNumber: userData.number,
+      content: textMessage,
+      timestamp: +Date.now(),
+    };
+    setTextMessage('');
+
+    const pushUserData = await database()
+      .ref('/users/' + token + '/chats' + '/' + userData.number)
+      .push({...messageObj});
+    const pushRecepientData = await database()
+      .ref('/users/' + userData.number + '/chats' + '/' + token)
+      .push({...messageObj});
+  }
+
   return (
     <View style={styles.rootContainer}>
-      <ScrollView
-        style={styles.chatContainer}
-        showsVerticalScrollIndicator={false}>
-        <ChatBubble dir={'left'} onLongPress={setSelectedMessage} />
-        <ChatBubble dir={'right'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'right'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'right'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'right'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'left'} />
-        <ChatBubble dir={'right'} />
-      </ScrollView>
+      {/* <ChatBubble dir={'left'} onLongPress={setSelectedMessage} /> */}
+
+      {chatsArray ? (
+        <FlatList
+          style={styles.chatContainer}
+          data={chatsArray}
+          renderItem={({item}) => <ChatBubble dir={'right'} data={item} />}
+        />
+      ) : (
+        <View style={styles.chatContainer}></View>
+      )}
       <View style={styles.messageInputContainer}>
-        <InputField placeholder={'Type Your Message'} />
+        <InputField
+          placeholder={'Type Your Message'}
+          message={textMessage}
+          setTextMessage={setTextMessage}
+        />
         <IconButton
           name="send"
           size={22}
           color={COLORS.white}
           bgColor={COLORS.green_200}
           style={styles.sendButton}
+          onPress={sendMessage}
         />
       </View>
     </View>

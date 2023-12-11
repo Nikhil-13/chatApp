@@ -18,7 +18,9 @@ import database from '@react-native-firebase/database';
 const reference = database().ref('/users/123');
 
 const OtpScreen = ({navigation, route}) => {
+  let resendCounter = 60;
   const [otp, setOtp] = useState('');
+  const [resendDisabled, setResendDisabled] = useState(true);
   const {authenticate} = useContext(AuthContext);
   const digitOne = useRef();
   const digitTwo = useRef();
@@ -26,6 +28,15 @@ const OtpScreen = ({navigation, route}) => {
   const digitFour = useRef();
   const digitFive = useRef();
   const digitSix = useRef();
+
+  useEffect(() => {
+    let timer = setTimeout(() => {
+      setResendDisabled(false);
+    }, 1000);
+    return () => {
+      clearTimeout(timer);
+    };
+  });
 
   useEffect(() => {
     if (otp.length === 6) {
@@ -69,10 +80,9 @@ const OtpScreen = ({navigation, route}) => {
       .ref('/users/' + contactNumber)
       .set({
         name: route.params?.name,
-        timeStamp: +Date.now(),
         number: contactNumber,
-      })
-      .then(() => console.log('data added'));
+        chats: {},
+      });
   }
 
   const contactNumber = route.params?.number;
@@ -186,12 +196,22 @@ const OtpScreen = ({navigation, route}) => {
           />
         </View>
         <Text style={styles.mutedText}>Enter 6-digit code</Text>
-        <FlatButton title={`Didn't receive code?`} color={COLORS.green_200} />
+        <FlatButton
+          title={`Didn't receive code?`}
+          disabled={resendDisabled}
+          color={COLORS.green_200}
+        />
+        {resendDisabled && (
+          <Text style={styles.mutedText}>
+            Wait for 1 minute to request again
+          </Text>
+        )}
+
         <IconButton
           name={'close'}
           color={COLORS.gray}
           size={24}
-          style={{position: 'absolute', left: 15}}
+          style={styles.cancelButton}
           onPress={navigateBack}
         />
       </View>

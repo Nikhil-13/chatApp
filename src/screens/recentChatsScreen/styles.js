@@ -4,6 +4,8 @@ import {COLORS} from '../../constants/theme';
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLORS.green_500,
     paddingBottom: Platform.select({ios: 20}),
   },
@@ -26,4 +28,6 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
   },
+  rightHeader: {flexDirection: 'row', gap: 10},
+  noChats: {color: COLORS.white, fontSize: 20},
 });

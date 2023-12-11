@@ -1,20 +1,18 @@
-import React, {useLayoutEffect} from 'react';
-import {View, Text, ScrollView} from 'react-native';
+import React, {useLayoutEffect, useContext, useEffect} from 'react';
+import {View, Text, ScrollView, FlatList} from 'react-native';
 import IconButton from '../../components/ui/iconButton';
 import ChatListCard from '../../components/ui/chatListCard';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {styles} from './styles';
 import {COLORS} from '../../constants/theme';
 import {addUsers} from '../../store/redux/userSlice';
 import database from '@react-native-firebase/database';
+import AuthContext from '../../store/context/authContext';
 
 const RecentChats = ({navigation, route}) => {
+  const {token, logout} = useContext(AuthContext);
   const dispatch = useDispatch();
   useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
-    });
-
     async function getAllUsers() {
       database()
         .ref('/users/')
@@ -23,31 +21,34 @@ const RecentChats = ({navigation, route}) => {
         });
     }
     getAllUsers();
-  });
+  }, []);
 
-  function LeftHeader({color}) {
-    return (
-      <Text style={[styles.leftHeaderTitle, {color: color}]}>ChatsApp</Text>
-    );
-  }
+  const userData = useSelector(state => state.user.users);
+  const userChatList = userData.filter(user => user.number === token)[0]?.chats;
+  const chatListArray = userChatList && Object.entries(userChatList);
 
-  function openChatHandler() {
-    navigation.navigate('ChatScreen');
+  function openChatHandler(item) {
+    console.log(item);
+    // const newObj = {name: 'rajehhs', number: item[0], chats: item[1]};
+    // navigation.navigate('ChatScreen', {data: newObj});
   }
   function newChatHandler() {
-    navigation.navigate('NewChatScreen');
+    navigation.navigate('NewChatScreen', {userNumber: token});
   }
 
   return (
     <View style={styles.rootContainer}>
-      <ScrollView alwaysBounceVertical={true}>
-        <ChatListCard
-          avatar={
-            'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png'
-          }
-          onPress={openChatHandler}
+      {chatListArray?.length === 0 ? (
+        <Text style={styles.noChats}>No Chats</Text>
+      ) : (
+        <FlatList
+          data={chatListArray}
+          alwaysBounceVertical={true}
+          renderItem={({item}) => (
+            <ChatListCard data={item} onPress={() => openChatHandler(item)} />
+          )}
         />
-      </ScrollView>
+      )}
       <IconButton
         name={'android-messages'}
         size={24}

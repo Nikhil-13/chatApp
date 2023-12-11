@@ -1,30 +1,39 @@
-import {useEffect, useState, useContext, useLayoutEffect} from 'react';
-import {StatusBar, Button, Linking, Platform} from 'react-native';
+import {useState, useContext, useLayoutEffect} from 'react';
+import {
+  StatusBar,
+  Linking,
+  Platform,
+  View,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import 'react-native-gesture-handler';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 import RecentChats from './src/screens/recentChatsScreen';
+import IconButton from './src/components/ui/iconButton';
 import LoginScreen from './src/screens/loginScreen';
 import OtpScreen from './src/screens/optScreen';
 import ChatScreen from './src/screens/chatScreen';
 import NewChat from './src/screens/newChatScreen';
-import IconButton from './src/components/ui/iconButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AuthContext, {
   AuthContextProvider,
 } from './src/store/context/authContext';
 import {COLORS} from './src/constants/theme';
+import UpdatesScreen from './src/screens/updatesScreen';
+import CallScreen from './src/screens/callsScreen';
 
 const Stack = createNativeStackNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
 
 const App = () => {
-  const [isReady, setIsReady] = useState(false);
-
   function AuthStack() {
     return (
       <Stack.Navigator
@@ -51,6 +60,27 @@ const App = () => {
   function AuthenticatedStack() {
     const {logout} = useContext(AuthContext);
 
+    function LeftHeader({color}) {
+      return (
+        <Text style={[styles.leftHeaderTitle, {color: color}]}>ChatsApp</Text>
+      );
+    }
+
+    function RightHeader({color}) {
+      return (
+        <View style={styles.rightHeader}>
+          <IconButton name={'magnify'} color={color} size={24} />
+          <IconButton name={'camera'} color={color} size={24} />
+          <IconButton
+            name={'logout'}
+            color={color}
+            onPress={logout}
+            size={24}
+            flat={true}
+          />
+        </View>
+      );
+    }
     return (
       <>
         <StatusBar
@@ -60,23 +90,21 @@ const App = () => {
         <Stack.Navigator
           screenOptions={{
             headerTintColor: COLORS.white,
-            headerStyle: {backgroundColor: COLORS.green_400, marginLeft: 50},
+            headerStyle: {
+              backgroundColor: COLORS.green_400,
+              marginLeft: 50,
+              elevation: 0,
+              shadowOpacity: 0,
+            },
             gestureEnabled: true,
             headerTitle: '',
           }}>
           <Stack.Screen
-            name="RecentChats"
-            component={RecentChats}
+            name="tabs"
+            component={TopTabs}
             options={{
-              headerRight: ({tintColor}) => (
-                <IconButton
-                  name={'logout'}
-                  color={tintColor}
-                  onPress={logout}
-                  size={24}
-                  flat={true}
-                />
-              ),
+              headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
+              headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
             }}
           />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
@@ -87,10 +115,11 @@ const App = () => {
   }
 
   function Navigation() {
-    const {isAuthenticated} = useContext(AuthContext);
+    const {isAuthenticated, logout} = useContext(AuthContext);
+    const [isReady, setIsReady] = useState(false);
     const [initialState, setInitialState] = useState();
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       const restoreState = async () => {
         try {
           const initialUrl = await Linking.getInitialURL();
@@ -132,10 +161,44 @@ const App = () => {
     );
   }
 
+  function TopTabs() {
+    return (
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: {
+            backgroundColor: COLORS.green_400,
+            padding: 0,
+            margin: 0,
+            borderWidth: 0,
+          },
+          tabBarContentContainerStyle: {
+            borderWidth: 0,
+            height: 40,
+          },
+          tabBarLabelStyle: {fontWeight: 'bold'},
+          tabBarIndicatorStyle: {borderWidth: 1, borderColor: COLORS.green_100},
+          tabBarActiveTintColor: COLORS.green_100,
+          tabBarInactiveTintColor: COLORS.gray,
+        }}>
+        <Tab.Screen name="Chats" component={RecentChats} />
+        <Tab.Screen name="Updates" component={UpdatesScreen} />
+        <Tab.Screen name="Calls" component={CallScreen} />
+      </Tab.Navigator>
+    );
+  }
+
   return (
     <AuthContextProvider>
       <Navigation />
     </AuthContextProvider>
   );
 };
+
+const styles = StyleSheet.create({
+  leftHeaderTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  rightHeader: {flexDirection: 'row', gap: 10},
+});
 export default App;
