@@ -1,7 +1,7 @@
 import {Text, Pressable} from 'react-native';
 import {styles} from './styles';
 
-const FlatButton = ({title, disabled, color, size, onPress}) => {
+const FlatButton = ({title, disabled, color, size, onPress, weight}) => {
   return (
     <Pressable
       onPress={onPress}
@@ -9,7 +9,7 @@ const FlatButton = ({title, disabled, color, size, onPress}) => {
       <Text
         style={[
           styles.btnTitle,
-          {color: color, fontSize: size},
+          {color: color, fontSize: size, fontWeight: weight},
           disabled && styles.disabled,
         ]}>
         {title}

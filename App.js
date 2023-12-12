@@ -1,4 +1,4 @@
-import {useState, useContext, useLayoutEffect} from 'react';
+import {useState, useContext, useEffect} from 'react';
 import {
   StatusBar,
   Linking,
@@ -13,20 +13,21 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
-import RecentChats from './src/screens/recentChatsScreen';
-import IconButton from './src/components/ui/iconButton';
-import LoginScreen from './src/screens/loginScreen';
 import OtpScreen from './src/screens/optScreen';
 import ChatScreen from './src/screens/chatScreen';
 import NewChat from './src/screens/newChatScreen';
+import CallScreen from './src/screens/callsScreen';
+import LoginScreen from './src/screens/loginScreen';
+import IconButton from './src/components/ui/iconButton';
+import UpdatesScreen from './src/screens/updatesScreen';
+import RecentChats from './src/screens/recentChatsScreen';
+import ForwardMessageScreen from './src/screens/forwardMessageScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AuthContext, {
   AuthContextProvider,
 } from './src/store/context/authContext';
 import {COLORS} from './src/constants/theme';
-import UpdatesScreen from './src/screens/updatesScreen';
-import CallScreen from './src/screens/callsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -109,6 +110,10 @@ const App = () => {
           />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen name="NewChatScreen" component={NewChat} />
+          <Stack.Screen
+            name="ForwardMessageScreen"
+            component={ForwardMessageScreen}
+          />
         </Stack.Navigator>
       </>
     );
@@ -119,7 +124,7 @@ const App = () => {
     const [isReady, setIsReady] = useState(false);
     const [initialState, setInitialState] = useState();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
       const restoreState = async () => {
         try {
           const initialUrl = await Linking.getInitialURL();
@@ -149,6 +154,7 @@ const App = () => {
     if (!isReady) {
       return null;
     }
+
     return (
       <NavigationContainer
         initialState={initialState}

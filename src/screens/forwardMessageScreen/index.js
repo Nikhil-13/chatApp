@@ -6,7 +6,7 @@ import ContactCard from '../../components/ui/contactCard';
 import IconButton from '../../components/ui/iconButton';
 import AuthContext from '../../store/context/authContext';
 
-const NewChat = ({navigation, route}) => {
+const ForwardMessageScreen = ({navigation, route}) => {
   const {token} = useContext(AuthContext);
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -15,6 +15,8 @@ const NewChat = ({navigation, route}) => {
     });
   });
 
+  const messageData = route.params?.messageData?.messageData;
+
   const users = useSelector(state => state.user.users);
   const userId = users.filter(user => user.number === token)[0];
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
@@ -22,8 +24,15 @@ const NewChat = ({navigation, route}) => {
 
   const usersCount = everyOneElse.length;
 
-  function startChatHandler(item) {
-    navigation.navigate('ChatScreen', {recepient: item});
+  function forwardMessageHandler(item) {
+    const forwardMessageObj = {
+      content: messageData?.content,
+      isFowarded: true,
+    };
+    navigation.navigate('ChatScreen', {
+      recepient: item,
+      fowardMessage: forwardMessageObj,
+    });
   }
 
   function LeftHeader({color}) {
@@ -38,10 +47,7 @@ const NewChat = ({navigation, route}) => {
         />
         <View>
           <Text style={[styles.headerHeadng, {color: color}]}>
-            Select Contact
-          </Text>
-          <Text style={[styles.contactsCount, {color: color}]}>
-            {usersCount}
+            Forward to...
           </Text>
         </View>
       </View>
@@ -50,10 +56,10 @@ const NewChat = ({navigation, route}) => {
 
   function RightHeader({color}) {
     return (
-      <>
-        <IconButton name={'magnify'} color={color} size={24} />
-        <IconButton name={'dots-vertical'} color={color} size={24} />
-      </>
+      <View style={styles.rightHeaderStyles}>
+        <IconButton name={'account-group'} color={color} size={26} />
+        <IconButton name={'magnify'} color={color} size={26} />
+      </View>
     );
   }
 
@@ -66,7 +72,10 @@ const NewChat = ({navigation, route}) => {
           alwaysBounceVertical={true}
           data={everyOneElse}
           renderItem={({item}) => (
-            <ContactCard data={item} onPress={() => startChatHandler(item)} />
+            <ContactCard
+              data={item}
+              onPress={() => forwardMessageHandler(item)}
+            />
           )}
         />
       )}
@@ -74,4 +83,4 @@ const NewChat = ({navigation, route}) => {
   );
 };
 
-export default NewChat;
+export default ForwardMessageScreen;

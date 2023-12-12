@@ -23,14 +23,15 @@ const RecentChats = ({navigation, route}) => {
     getAllUsers();
   }, []);
 
-  const userData = useSelector(state => state.user.users);
-  const userChatList = userData.filter(user => user.number === token)[0]?.chats;
+  const users = useSelector(state => state.user.users);
+  const userId = users.filter(user => user.number === token)[0];
+  const userChatList = users.filter(user => user.number === token)[0]?.chats;
   const chatListArray = userChatList && Object.entries(userChatList);
+  const everyOneElse = users.filter(user => user.number !== token);
 
   function openChatHandler(item) {
-    console.log(item);
-    // const newObj = {name: 'rajehhs', number: item[0], chats: item[1]};
-    // navigation.navigate('ChatScreen', {data: newObj});
+    const chatObj = item[0];
+    navigation.navigate('ChatScreen', {recepient: chatObj});
   }
   function newChatHandler() {
     navigation.navigate('NewChatScreen', {userNumber: token});
@@ -38,14 +39,17 @@ const RecentChats = ({navigation, route}) => {
 
   return (
     <View style={styles.rootContainer}>
-      {chatListArray?.length === 0 ? (
+      {chatListArray === undefined ? (
         <Text style={styles.noChats}>No Chats</Text>
       ) : (
         <FlatList
           data={chatListArray}
           alwaysBounceVertical={true}
           renderItem={({item}) => (
-            <ChatListCard data={item} onPress={() => openChatHandler(item)} />
+            <ChatListCard
+              data={item}
+              onPress={() => openChatHandler(everyOneElse)}
+            />
           )}
         />
       )}

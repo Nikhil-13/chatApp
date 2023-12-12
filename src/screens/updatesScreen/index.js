@@ -1,11 +1,10 @@
 import {View, Text} from 'react-native';
-import React from 'react';
-import {COLORS} from '../../constants/theme';
+import {styles} from './styles';
 
 const UpdatesScreen = () => {
   return (
-    <View style={{backgroundColor: COLORS.green_500, flex: 1}}>
-      <Text style={{color: 'white'}}>CallScreen</Text>
+    <View style={styles.rootContainer}>
+      <Text style={{color: 'white'}}>Updates</Text>
     </View>
   );
 };

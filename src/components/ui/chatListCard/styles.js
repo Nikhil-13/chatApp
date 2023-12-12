@@ -3,6 +3,7 @@ import {COLORS} from '../../../constants/theme';
 export const styles = StyleSheet.create({
   rootContainer: {
     height: 70,
+    maxWidth: '100%',
   },
   outerContainer: {
     marginVertical: 5,
@@ -47,5 +48,10 @@ export const styles = StyleSheet.create({
   },
   messageText: {
     color: COLORS.white,
+  },
+  lastMessageSenderText: {
+    color: COLORS.gray,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

@@ -37,3 +37,21 @@ export function getInitials(name) {
   }
   return initials;
 }
+
+export function sortByTimestamp(inputArray) {
+  const sortedArray = inputArray.sort(
+    (a, b) => a[1].timestamp - b[1].timestamp,
+  );
+  return sortedArray;
+}
+
+export function timestampToLocal(timestamp) {
+  const timestampInMilliseconds = timestamp * 1000;
+  const date = new Date(timestampInMilliseconds);
+  const localTime = date.toLocaleString('en-US', {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+  return localTime;
+}

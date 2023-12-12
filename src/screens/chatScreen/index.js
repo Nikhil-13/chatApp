@@ -1,4 +1,4 @@
-import {View, ScrollView, Text, Image, FlatList} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
 import {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
@@ -7,17 +7,32 @@ import {useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {styles} from './styles';
 import {COLORS} from '../../constants/theme';
-import {getInitials} from '../../util/helper';
+import {getInitials, sortByTimestamp} from '../../util/helper';
 import database from '@react-native-firebase/database';
 import AuthContext from '../../store/context/authContext';
+import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState();
   const [textMessage, setTextMessage] = useState();
+  const [chatReplyActive, setChatReplyActive] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+
   const {token} = useContext(AuthContext);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
+      headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
+    });
+  }, []);
 
   useEffect(() => {
     if (!!selectedMessage) {
+      function backPressHandler() {
+        setChatReplyActive(false);
+        setSelectedMessage('');
+      }
       navigation.setOptions({
         headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
         headerLeft: ({tintColor}) => (
@@ -25,24 +40,73 @@ const ChatScreen = ({navigation, route}) => {
             name="arrow-left"
             size={24}
             color={tintColor}
-            onPress={() => setSelectedMessage(false)}
+            onPress={backPressHandler}
             style={styles.fullHeight}
           />
         ),
       });
+    } else {
+      navigation.setOptions({
+        headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
+        headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
+      });
     }
   }, [selectedMessage]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
-      headerRight: () => {},
-    });
-  });
+  useEffect(() => {
+    if (route.params.fowardMessage) {
+      async function forwardMessage() {
+        const forwardMessageObj = {
+          ...route.params.fowardMessage,
+          timestamp: new Date().getTime() / 1000,
+          recepientName: recepientName,
+          recepientNumber: recepientNumber,
+        };
+        const pushUserData = await database()
+          .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+          .push({...forwardMessageObj});
+        const pushRecepientData = await database()
+          .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+          .push({...forwardMessageObj});
+      }
+      forwardMessage();
+    }
+  }, [route.params]);
 
-  const userData = route.params?.data;
-  console.log(userData);
-  const chatsArray = Object.entries(userData?.chats).reverse();
+  const users = useSelector(state => state.user.users);
+  const userData = users.filter(user => user.number === token)[0];
+  const userChatList = users.filter(user => user.number === token)[0]?.chats;
+
+  const recepientName = route.params?.recepient?.name;
+  const recepientNumber = route.params?.recepient?.number;
+  const chatDataArray =
+    userChatList &&
+    sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+
+  async function deleteForMeHandler() {
+    setModalVisible(!isModalVisible);
+    const endpoint =
+      '/users/' +
+      token +
+      '/chats/' +
+      recepientNumber +
+      '/' +
+      selectedMessage.messageId;
+    const data = await database().ref(endpoint).remove();
+  }
+
+  function deleteButtonHandler() {
+    setModalVisible(!isModalVisible);
+  }
+
+  function forwardMessageHandler() {
+    setSelectedMessage('');
+    navigation.navigate('ForwardMessageScreen', {messageData: selectedMessage});
+  }
+
+  function replyInChatHandler() {
+    setChatReplyActive(true);
+  }
 
   function LeftHeader({color}) {
     return (
@@ -55,9 +119,9 @@ const ChatScreen = ({navigation, route}) => {
           style={styles.fullHeight}
         />
         <View style={styles.avatarImage}>
-          <Text style={styles.initials}>{getInitials(userData.name)}</Text>
+          <Text style={styles.initials}>{getInitials(recepientName)}</Text>
         </View>
-        <Text style={{color: color, fontSize: 18}}>{userData.name}</Text>
+        <Text style={{color: color, fontSize: 18}}>{recepientName}</Text>
       </View>
     );
   }
@@ -65,38 +129,96 @@ const ChatScreen = ({navigation, route}) => {
   function RightHeader({color}) {
     return (
       <View style={[styles.rightHeader, styles.fullHeight]}>
-        <IconButton name={'delete'} color={color} size={24} />
-        <Icon name={'mail-forward'} color={color} size={22} />
+        <Icon
+          name={'mail-reply'}
+          color={color}
+          size={20}
+          onPress={replyInChatHandler}
+        />
+        <IconButton
+          name={'delete'}
+          color={color}
+          size={24}
+          onPress={deleteButtonHandler}
+        />
+        <Icon
+          name={'mail-forward'}
+          color={color}
+          size={20}
+          onPress={forwardMessageHandler}
+        />
+      </View>
+    );
+  }
+
+  function DefaultRightHeader({color}) {
+    return (
+      <View style={[styles.rightHeader, styles.fullHeight]}>
+        <IconButton name={'video'} color={color} size={24} />
+        <IconButton name={'camera'} color={color} size={24} />
+        <IconButton name={'dots-vertical'} color={color} size={24} />
       </View>
     );
   }
 
   async function sendMessage() {
-    const messageObj = {
-      recepientName: userData.name,
-      recepientNumber: userData.number,
-      content: textMessage,
-      timestamp: +Date.now(),
-    };
-    setTextMessage('');
+    if (textMessage !== '') {
+      const timeStamp = new Date().getTime() / 1000;
+      const messageObj = {
+        recepientName: recepientName,
+        recepientNumber: recepientNumber,
+        content: textMessage,
+        timestamp: timeStamp,
+      };
+      setTextMessage('');
+      const pushUserData = await database()
+        .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+        .push({...messageObj});
+      const pushRecepientData = await database()
+        .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+        .push({...messageObj});
+    }
+  }
 
-    const pushUserData = await database()
-      .ref('/users/' + token + '/chats' + '/' + userData.number)
-      .push({...messageObj});
-    const pushRecepientData = await database()
-      .ref('/users/' + userData.number + '/chats' + '/' + token)
-      .push({...messageObj});
+  async function sendReply() {
+    if (textMessage !== '') {
+      const timeStamp = new Date().getTime() / 1000;
+      const messageObj = {
+        content: textMessage,
+        recepientName: recepientName,
+        recepientNumber: recepientNumber,
+        replyId: selectedMessage.messageId,
+        timestamp: timeStamp,
+        repliedTo: selectedMessage.messageData.content,
+      };
+      setTextMessage('');
+      setSelectedMessage('');
+      // setChatReplyActive(false);
+      const pushUserData = await database()
+        .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+        .push({...messageObj});
+      const pushRecepientData = await database()
+        .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+        .push({...messageObj});
+    }
   }
 
   return (
     <View style={styles.rootContainer}>
-      {/* <ChatBubble dir={'left'} onLongPress={setSelectedMessage} /> */}
-
-      {chatsArray ? (
+      {chatDataArray ? (
         <FlatList
           style={styles.chatContainer}
-          data={chatsArray}
-          renderItem={({item}) => <ChatBubble dir={'right'} data={item} />}
+          data={chatDataArray}
+          keyExtractor={item => item[0]}
+          renderItem={({item}) => (
+            <ChatBubble
+              messageKey={item[0]}
+              recepientNumber={recepientNumber}
+              userNumber={token}
+              onLongPress={setSelectedMessage}
+              messageData={item[1]}
+            />
+          )}
         />
       ) : (
         <View style={styles.chatContainer}></View>
@@ -113,9 +235,14 @@ const ChatScreen = ({navigation, route}) => {
           color={COLORS.white}
           bgColor={COLORS.green_200}
           style={styles.sendButton}
-          onPress={sendMessage}
+          onPress={chatReplyActive ? sendReply : sendMessage}
         />
       </View>
+      <DeleteMessageModal
+        isModalVisible={isModalVisible}
+        setModalVisible={setModalVisible}
+        deleteForMe={deleteForMeHandler}
+      />
     </View>
   );
 };
