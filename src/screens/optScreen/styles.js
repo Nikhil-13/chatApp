@@ -54,4 +54,5 @@ export const styles = StyleSheet.create({
     top: Platform.select({ios: 1, android: 2}),
     left: Platform.select({ios: 15, android: 0}),
   },
+  userNumber: {flexDirection: 'row', alignSelf: 'center'},
 });

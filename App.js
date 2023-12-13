@@ -23,175 +23,185 @@ import UpdatesScreen from './src/screens/updatesScreen';
 import RecentChats from './src/screens/recentChatsScreen';
 import ForwardMessageScreen from './src/screens/forwardMessageScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {TAB_SCREEN_NAMES, SCREEN_NAMES} from './src/constants/navigation';
 
 import AuthContext, {
   AuthContextProvider,
 } from './src/store/context/authContext';
 import {COLORS} from './src/constants/theme';
+import Navigation from './src/navigation';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
 
-const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
-
 const App = () => {
-  function AuthStack() {
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerTintColor: COLORS.white,
-          headerStyle: {backgroundColor: COLORS.green_400},
-          cardStyle: {backgroundColor: COLORS.primary_black},
-          gestureEnabled: true,
-        }}>
-        <Stack.Screen
-          name="LoginScreen"
-          component={LoginScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="OtpScreen"
-          component={OtpScreen}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    );
-  }
+  // function AuthStack() {
+  //   return (
+  //     <Stack.Navigator
+  //       screenOptions={{
+  //         headerTintColor: COLORS.white,
+  //         headerStyle: {backgroundColor: COLORS.green_400},
+  //         cardStyle: {backgroundColor: COLORS.primary_black},
+  //         gestureEnabled: true,
+  //       }}>
+  //       <Stack.Screen
+  //         name={SCREEN_NAMES.LOGIN_SCREEN}
+  //         component={LoginScreen}
+  //         options={{headerShown: false}}
+  //       />
+  //       <Stack.Screen
+  //         name={SCREEN_NAMES.OTP_SCREEN}
+  //         component={OtpScreen}
+  //         options={{headerShown: false}}
+  //       />
+  //     </Stack.Navigator>
+  //   );
+  // }
 
-  function AuthenticatedStack() {
-    const {logout} = useContext(AuthContext);
+  // function AuthenticatedStack() {
+  //   const {logout} = useContext(AuthContext);
 
-    function LeftHeader({color}) {
-      return (
-        <Text style={[styles.leftHeaderTitle, {color: color}]}>ChatsApp</Text>
-      );
-    }
+  //   function LeftHeader({color}) {
+  //     return (
+  //       <Text style={[styles.leftHeaderTitle, {color: color}]}>ChatsApp</Text>
+  //     );
+  //   }
 
-    function RightHeader({color}) {
-      return (
-        <View style={styles.rightHeader}>
-          <IconButton name={'magnify'} color={color} size={24} />
-          <IconButton name={'camera'} color={color} size={24} />
-          <IconButton
-            name={'logout'}
-            color={color}
-            onPress={logout}
-            size={24}
-            flat={true}
-          />
-        </View>
-      );
-    }
-    return (
-      <>
-        <StatusBar
-          backgroundColor={COLORS.green_400}
-          barStyle={'light-content'}
-        />
-        <Stack.Navigator
-          screenOptions={{
-            headerTintColor: COLORS.white,
-            headerStyle: {
-              backgroundColor: COLORS.green_400,
-              marginLeft: 50,
-              elevation: 0,
-              shadowOpacity: 0,
-            },
-            gestureEnabled: true,
-            headerTitle: '',
-          }}>
-          <Stack.Screen
-            name="tabs"
-            component={TopTabs}
-            options={{
-              headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
-              headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
-            }}
-          />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          <Stack.Screen name="NewChatScreen" component={NewChat} />
-          <Stack.Screen
-            name="ForwardMessageScreen"
-            component={ForwardMessageScreen}
-          />
-        </Stack.Navigator>
-      </>
-    );
-  }
+  //   function RightHeader({color}) {
+  //     return (
+  //       <View style={styles.rightHeader}>
+  //         <IconButton name={'magnify'} color={color} size={24} />
+  //         <IconButton name={'camera'} color={color} size={24} />
+  //         <IconButton
+  //           name={'logout'}
+  //           color={color}
+  //           onPress={logout}
+  //           size={24}
+  //           flat={true}
+  //         />
+  //       </View>
+  //     );
+  //   }
+  //   return (
+  //     <>
+  //       <StatusBar
+  //         backgroundColor={COLORS.green_400}
+  //         barStyle={'light-content'}
+  //       />
+  //       <Stack.Navigator
+  //         screenOptions={{
+  //           headerTintColor: COLORS.white,
+  //           headerStyle: {
+  //             backgroundColor: COLORS.green_400,
+  //             marginLeft: 50,
+  //             elevation: 0,
+  //             shadowOpacity: 0,
+  //           },
+  //           gestureEnabled: true,
+  //           headerTitle: '',
+  //         }}>
+  //         <Stack.Screen
+  //           name="tabs"
+  //           component={TopTabs}
+  //           options={{
+  //             headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
+  //             headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
+  //           }}
+  //         />
+  //         <Stack.Screen
+  //           name={SCREEN_NAMES.CHAT_SCREEN}
+  //           component={ChatScreen}
+  //         />
+  //         <Stack.Screen
+  //           name={SCREEN_NAMES.NEW_CHAT_SCREEN}
+  //           component={NewChat}
+  //         />
+  //         <Stack.Screen
+  //           name={SCREEN_NAMES.FORWARD_MESSAGE_SCREEN}
+  //           component={ForwardMessageScreen}
+  //         />
+  //       </Stack.Navigator>
+  //     </>
+  //   );
+  // }
+  // const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1';
 
-  function Navigation() {
-    const {isAuthenticated, logout} = useContext(AuthContext);
-    const [isReady, setIsReady] = useState(false);
-    const [initialState, setInitialState] = useState();
+  // function Navigation() {
+  //   const {isAuthenticated, logout} = useContext(AuthContext);
+  //   const [isReady, setIsReady] = useState(false);
+  //   const [initialState, setInitialState] = useState();
 
-    useEffect(() => {
-      const restoreState = async () => {
-        try {
-          const initialUrl = await Linking.getInitialURL();
+  //   useEffect(() => {
+  //     const restoreState = async () => {
+  //       try {
+  //         const initialUrl = await Linking.getInitialURL();
 
-          if (Platform.OS !== 'web' && initialUrl == null) {
-            const savedStateString = await AsyncStorage.getItem(
-              PERSISTENCE_KEY,
-            );
-            const state = savedStateString
-              ? JSON.parse(savedStateString)
-              : undefined;
+  //         if (Platform.OS !== 'web' && initialUrl == null) {
+  //           const savedStateString = await AsyncStorage.getItem(
+  //             PERSISTENCE_KEY,
+  //           );
+  //           const state = savedStateString
+  //             ? JSON.parse(savedStateString)
+  //             : undefined;
 
-            if (state !== undefined) {
-              setInitialState(state);
-            }
-          }
-        } finally {
-          setIsReady(true);
-        }
-      };
+  //           if (state !== undefined) {
+  //             setInitialState(state);
+  //           }
+  //         }
+  //       } finally {
+  //         setIsReady(true);
+  //       }
+  //     };
 
-      if (!isReady) {
-        restoreState();
-      }
-    }, [isReady]);
+  //     if (!isReady) {
+  //       restoreState();
+  //     }
+  //   }, [isReady]);
 
-    if (!isReady) {
-      return null;
-    }
+  //   if (!isReady) {
+  //     return null;
+  //   }
 
-    return (
-      <NavigationContainer
-        initialState={initialState}
-        onStateChange={state =>
-          AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
-        }>
-        {!isAuthenticated && <AuthStack />}
-        {isAuthenticated && <AuthenticatedStack />}
-      </NavigationContainer>
-    );
-  }
+  //   return (
+  //     <NavigationContainer
+  //       initialState={initialState}
+  //       onStateChange={state =>
+  //         AsyncStorage.setItem(PERSISTENCE_KEY, JSON.stringify(state))
+  //       }>
+  //       {!isAuthenticated && <AuthStack />}
+  //       {isAuthenticated && <AuthenticatedStack />}
+  //     </NavigationContainer>
+  //   );
+  // }
 
-  function TopTabs() {
-    return (
-      <Tab.Navigator
-        screenOptions={{
-          tabBarStyle: {
-            backgroundColor: COLORS.green_400,
-            padding: 0,
-            margin: 0,
-            borderWidth: 0,
-          },
-          tabBarContentContainerStyle: {
-            borderWidth: 0,
-            height: 40,
-          },
-          tabBarLabelStyle: {fontWeight: 'bold'},
-          tabBarIndicatorStyle: {borderWidth: 1, borderColor: COLORS.green_100},
-          tabBarActiveTintColor: COLORS.green_100,
-          tabBarInactiveTintColor: COLORS.gray,
-        }}>
-        <Tab.Screen name="Chats" component={RecentChats} />
-        <Tab.Screen name="Updates" component={UpdatesScreen} />
-        <Tab.Screen name="Calls" component={CallScreen} />
-      </Tab.Navigator>
-    );
-  }
+  // function TopTabs() {
+  //   return (
+  //     <Tab.Navigator
+  //       screenOptions={{
+  //         tabBarStyle: {
+  //           backgroundColor: COLORS.green_400,
+  //           padding: 0,
+  //           margin: 0,
+  //           borderWidth: 0,
+  //         },
+  //         tabBarContentContainerStyle: {
+  //           borderWidth: 0,
+  //           height: 40,
+  //         },
+  //         tabBarLabelStyle: {fontWeight: 'bold'},
+  //         tabBarIndicatorStyle: {borderWidth: 1, borderColor: COLORS.green_100},
+  //         tabBarActiveTintColor: COLORS.green_100,
+  //         tabBarInactiveTintColor: COLORS.gray,
+  //       }}>
+  //       <Tab.Screen
+  //         name={TAB_SCREEN_NAMES.RECENT_CHATS}
+  //         component={RecentChats}
+  //       />
+  //       <Tab.Screen name={TAB_SCREEN_NAMES.UPDATES} component={UpdatesScreen} />
+  //       <Tab.Screen name={TAB_SCREEN_NAMES.CALLS} component={CallScreen} />
+  //     </Tab.Navigator>
+  //   );
+  // }
 
   return (
     <AuthContextProvider>
@@ -200,11 +210,4 @@ const App = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  leftHeaderTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-  },
-  rightHeader: {flexDirection: 'row', gap: 10},
-});
 export default App;

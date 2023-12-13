@@ -5,6 +5,8 @@ import {styles} from './styles';
 import ContactCard from '../../components/ui/contactCard';
 import IconButton from '../../components/ui/iconButton';
 import AuthContext from '../../store/context/authContext';
+import {SCREEN_NAMES, SCREEN_HEADER_TITLES} from '../../constants/navigation';
+import {HEADERS} from '../../constants/strings';
 
 const ForwardMessageScreen = ({navigation, route}) => {
   const {token} = useContext(AuthContext);
@@ -29,7 +31,7 @@ const ForwardMessageScreen = ({navigation, route}) => {
       content: messageData?.content,
       isFowarded: true,
     };
-    navigation.navigate('ChatScreen', {
+    navigation.navigate(SCREEN_NAMES.CHAT_SCREEN, {
       recepient: item,
       fowardMessage: forwardMessageObj,
     });
@@ -47,7 +49,7 @@ const ForwardMessageScreen = ({navigation, route}) => {
         />
         <View>
           <Text style={[styles.headerHeadng, {color: color}]}>
-            Forward to...
+            {SCREEN_HEADER_TITLES.forward_to}
           </Text>
         </View>
       </View>
@@ -65,8 +67,8 @@ const ForwardMessageScreen = ({navigation, route}) => {
 
   return (
     <View style={styles.rootContainer}>
-      {users.length === 0 ? (
-        <Text style={styles.noContacts}>No Contacts</Text>
+      {usersCount === 0 ? (
+        <Text style={styles.noContacts}>{HEADERS.no_contacts}</Text>
       ) : (
         <FlatList
           alwaysBounceVertical={true}

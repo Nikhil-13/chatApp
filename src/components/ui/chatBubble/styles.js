@@ -23,6 +23,7 @@ export const styles = StyleSheet.create({
   forwardMessageContainer: {
     flexDirection: 'row',
     gap: 5,
+    paddingBottom: 5,
     paddingLeft: 4,
     alignItems: 'center',
   },

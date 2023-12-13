@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  TextInput,
-  Alert,
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
+import {View, Text, TextInput, SafeAreaView, StatusBar} from 'react-native';
 import React, {useState, useRef, useContext, useEffect} from 'react';
 import {COLORS} from '../../constants/theme';
 import {styles} from './styles';
@@ -14,8 +7,13 @@ import AuthContext from '../../store/context/authContext';
 import IconButton from '../../components/ui/iconButton';
 import FlatButton from '../../components/ui/flatButton';
 import database from '@react-native-firebase/database';
-
-const reference = database().ref('/users/123');
+import {
+  BUTTON_TITLES,
+  HEADERS,
+  INPUT_PLACEHOLDERS,
+  NORMAL_TEXTS,
+} from '../../constants/strings';
+import {DEFAULT_VALUES} from '../../constants/enums';
 
 const OtpScreen = ({navigation, route}) => {
   let resendCounter = 60;
@@ -40,7 +38,18 @@ const OtpScreen = ({navigation, route}) => {
 
   useEffect(() => {
     if (otp.length === 6) {
-      submitHandler();
+      database()
+        .ref('/users/' + contactNumber)
+        .once('value')
+        .then(snapshot => {
+          if (snapshot.val() === null) {
+            authenticate(contactNumber, name.trim());
+            registerUser();
+          } else {
+            const data = snapshot.val();
+            authenticate(data.number, data.name.trim());
+          }
+        });
     }
   }, [otp]);
 
@@ -59,15 +68,8 @@ const OtpScreen = ({navigation, route}) => {
         }
         prevElement.current.focus();
       }
-    }
-  }
-
-  function submitHandler() {
-    if (otp.length === 6) {
-      authenticate(contactNumber, name.trim());
-      registerUser();
-    } else {
-      Alert.alert('Invalid OTP!!', 'Please Enter a 6 digit OTP.');
+    } else if (nativeEvent.key === 'Backspace' && prevElement === '') {
+      setOtp('');
     }
   }
 
@@ -92,17 +94,15 @@ const OtpScreen = ({navigation, route}) => {
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar barStyle={'dark-content'} backgroundColor={COLORS.white} />
       <View style={styles.detailSection}>
-        <Text style={styles.headerText}>Verifying your number</Text>
+        <Text style={styles.headerText}>{HEADERS.verify_number}</Text>
         <View style={styles.textSection}>
-          <Text style={styles.normalText}>
-            Whatsapp will read sms automatically sent to{' '}
-          </Text>
-          <View style={{flexDirection: 'row', alignSelf: 'center'}}>
+          <Text style={styles.normalText}>{NORMAL_TEXTS.sms}</Text>
+          <View style={styles.userNumber}>
             <Text style={[styles.normalText, {fontWeight: 'bold'}]}>
-              +91 {formattedNumber(contactNumber)}{' '}
+              +{DEFAULT_VALUES.country_code} {formattedNumber(contactNumber)}{' '}
             </Text>
             <FlatButton
-              title={`Wrong number?`}
+              title={BUTTON_TITLES.wrong_number}
               size={14}
               color={'blue'}
               onPress={navigateBack}
@@ -116,7 +116,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             autoFocus={true}
             value={otp[0]}
@@ -130,7 +130,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             onChangeText={digitInputHandler.bind(this, digitThree)}
             onKeyPress={({nativeEvent}) =>
@@ -144,7 +144,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             onChangeText={digitInputHandler.bind(this, digitFour)}
             onKeyPress={({nativeEvent}) =>
@@ -159,7 +159,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             onChangeText={digitInputHandler.bind(this, digitFive)}
             onKeyPress={({nativeEvent}) =>
@@ -173,7 +173,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             onChangeText={digitInputHandler.bind(this, digitSix)}
             onKeyPress={({nativeEvent}) =>
@@ -187,7 +187,7 @@ const OtpScreen = ({navigation, route}) => {
             keyboardType="number-pad"
             maxLength={1}
             returnKeyType="next"
-            placeholder="-"
+            placeholder={INPUT_PLACEHOLDERS.otp}
             placeholderTextColor={COLORS.primary_black}
             onChangeText={digitInputHandler.bind(this, '')}
             onKeyPress={({nativeEvent}) =>
@@ -195,16 +195,14 @@ const OtpScreen = ({navigation, route}) => {
             }
           />
         </View>
-        <Text style={styles.mutedText}>Enter 6-digit code</Text>
+        <Text style={styles.mutedText}>{NORMAL_TEXTS.six_digit}</Text>
         <FlatButton
-          title={`Didn't receive code?`}
+          title={BUTTON_TITLES.resend_otp}
           disabled={resendDisabled}
           color={COLORS.green_200}
         />
         {resendDisabled && (
-          <Text style={styles.mutedText}>
-            Wait for 1 minute to request again
-          </Text>
+          <Text style={styles.mutedText}>{NORMAL_TEXTS.send_again}</Text>
         )}
 
         <IconButton

@@ -1,11 +1,18 @@
 export const SCREEN_HEADER_TITLES = {
-  CHAT_SCREEN: 'default',
-  CHAT_LIST_SCREEN: 'Chats',
-  LOGIN_SCREEN: 'Login',
+  forward_to: 'Forward to...',
+  new_chat_screen: 'Select Contact',
 };
 
 export const SCREEN_NAMES = {
-  CHAT_SCREEN: 'default',
-  CHAT_LIST_SCREEN: 'Chats',
-  LOGIN_SCREEN: 'Login',
+  CHAT_SCREEN: 'ChatScreen',
+  NEW_CHAT_SCREEN: 'NewChatScreen',
+  LOGIN_SCREEN: 'LoginScreen',
+  OTP_SCREEN: 'OtpScreen',
+  FORWARD_MESSAGE_SCREEN: 'ForwardMessageScreen',
+};
+
+export const TAB_SCREEN_NAMES = {
+  RECENT_CHATS: 'Chats',
+  UPDATES: 'Updates',
+  CALLS: 'Calls',
 };

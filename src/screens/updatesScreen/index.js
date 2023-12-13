@@ -1,12 +1,8 @@
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import {styles} from './styles';
 
 const UpdatesScreen = () => {
-  return (
-    <View style={styles.rootContainer}>
-      <Text style={{color: 'white'}}>Updates</Text>
-    </View>
-  );
+  return <View style={styles.rootContainer}></View>;
 };
 
 export default UpdatesScreen;

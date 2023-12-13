@@ -1,5 +1,5 @@
 import React, {useLayoutEffect, useContext, useEffect} from 'react';
-import {View, Text, ScrollView, FlatList} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
 import IconButton from '../../components/ui/iconButton';
 import ChatListCard from '../../components/ui/chatListCard';
 import {useDispatch, useSelector} from 'react-redux';
@@ -8,10 +8,13 @@ import {COLORS} from '../../constants/theme';
 import {addUsers} from '../../store/redux/userSlice';
 import database from '@react-native-firebase/database';
 import AuthContext from '../../store/context/authContext';
+import {SCREEN_NAMES} from '../../constants/navigation';
+import {HEADERS} from '../../constants/strings';
 
 const RecentChats = ({navigation, route}) => {
   const {token, logout} = useContext(AuthContext);
   const dispatch = useDispatch();
+
   useLayoutEffect(() => {
     async function getAllUsers() {
       database()
@@ -31,16 +34,16 @@ const RecentChats = ({navigation, route}) => {
 
   function openChatHandler(item) {
     const chatObj = item[0];
-    navigation.navigate('ChatScreen', {recepient: chatObj});
+    navigation.navigate(SCREEN_NAMES.CHAT_SCREEN, {recepient: chatObj});
   }
   function newChatHandler() {
-    navigation.navigate('NewChatScreen', {userNumber: token});
+    navigation.navigate(SCREEN_NAMES.NEW_CHAT_SCREEN, {userNumber: token});
   }
 
   return (
     <View style={styles.rootContainer}>
       {chatListArray === undefined ? (
-        <Text style={styles.noChats}>No Chats</Text>
+        <Text style={styles.noChats}>{HEADERS.no_chats}</Text>
       ) : (
         <FlatList
           data={chatListArray}

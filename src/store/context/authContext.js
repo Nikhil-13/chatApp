@@ -17,11 +17,11 @@ export const AuthContextProvider = ({children}) => {
   useEffect(() => {
     async function getTokenFromStorage() {
       const token = await AsyncStorage.getItem('token');
+      setAuthToken(token);
       const userName = await AsyncStorage.getItem('userName');
-      if (token) {
-        setAuthToken(token);
-        setUserName(userName);
-      }
+      // if (token) {
+      setUserName(userName);
+      // }
     }
     getTokenFromStorage();
   }, []);

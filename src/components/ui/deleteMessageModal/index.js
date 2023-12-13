@@ -3,6 +3,7 @@ import Modal from 'react-native-modal';
 import {styles} from './styles';
 import FlatButton from '../flatButton';
 import {COLORS} from '../../../constants/theme';
+import {BUTTON_TITLES, HEADERS} from '../../../constants/strings';
 
 function DeleteMessageModal({isModalVisible, setModalVisible, deleteForMe}) {
   const toggleModal = () => {
@@ -22,22 +23,22 @@ function DeleteMessageModal({isModalVisible, setModalVisible, deleteForMe}) {
       onBackButtonPress={toggleModal}>
       <View style={styles.rootContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalHeaderText}>Delete Message?</Text>
+          <Text style={styles.modalHeaderText}>{HEADERS.delete_message}</Text>
         </View>
         <View style={styles.buttonsContainer}>
           <FlatButton
-            title={'Delete for Everyone'}
+            title={BUTTON_TITLES.delete_for_everyone}
             weight={'bold'}
             color={COLORS.green_100}
           />
           <FlatButton
-            title={'Delete for Me'}
+            title={BUTTON_TITLES.delete_for_me}
             weight={'bold'}
             color={COLORS.green_100}
             onPress={deleteForMe}
           />
           <FlatButton
-            title={'Cancel'}
+            title={BUTTON_TITLES.cancel}
             color={COLORS.green_100}
             weight={'bold'}
             onPress={toggleModal}

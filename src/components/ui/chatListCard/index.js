@@ -2,6 +2,7 @@ import {View, Text, Pressable} from 'react-native';
 import React, {useContext} from 'react';
 import {styles} from './styles';
 import {useSelector} from 'react-redux';
+import {DEFAULT_USER_DETAIL} from '../../../constants/strings';
 import {
   getInitials,
   timestampToLocal,
@@ -28,20 +29,22 @@ const ChatListCard = ({data, onPress}) => {
           <View style={styles.userDetail}>
             <Text style={styles.userNameText}>{userName}</Text>
             <Text style={styles.messageTime}>
-              {timestampToLocal(lastMessage[1].timestamp)}
+              {lastMessage && timestampToLocal(lastMessage[1].timestamp)}
             </Text>
           </View>
           <View style={styles.messageDetailContainer}>
-            <View style={{flexDirection: 'row'}}>
-              {lastMessage[1].recepientName === userName ? (
-                <Text style={styles.lastMessageSenderText}>You: </Text>
-              ) : (
+            <View style={styles.lastMessageTextContainer}>
+              {lastMessage && lastMessage[1].recepientName === userName ? (
                 <Text style={styles.lastMessageSenderText}>
-                  {userName}
+                  {DEFAULT_USER_DETAIL.you}
                   {': '}
                 </Text>
+              ) : (
+                ''
               )}
-              <Text style={styles.messageText}>{lastMessage[1].content}</Text>
+              <Text style={styles.messageText}>
+                {lastMessage && lastMessage[1].content}
+              </Text>
             </View>
           </View>
         </View>

@@ -48,9 +48,14 @@ export const styles = StyleSheet.create({
   },
   nameInputContainer: {
     width: 150,
-    padding: Platform.select({ios: 4, android: 0}),
+    padding: Platform.select({ios: 4}),
     borderBottomWidth: 1,
+    alignItems: 'center',
     borderColor: COLORS.green_200,
+  },
+  nameInput: {
+    color: COLORS.black,
+    padding: 0,
   },
   numberInput: {
     flex: 1,
@@ -71,10 +76,5 @@ export const styles = StyleSheet.create({
   normalText: {
     color: COLORS.black,
     fontSize: 14,
-  },
-  nameInput: {
-    textAlign: 'center',
-    color: COLORS.black,
-    padding: 0,
   },
 });

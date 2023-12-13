@@ -1,7 +1,6 @@
-import {View, Text, Image, Pressable} from 'react-native';
-import {useSelector} from 'react-redux';
-import React from 'react';
+import {View, Text, Pressable} from 'react-native';
 import {getInitials} from '../../../util/helper';
+import {DEFAULT_USER_DETAIL} from '../../../constants/strings';
 import {styles} from './styles';
 
 const ContactCard = ({onPress, data}) => {
@@ -16,7 +15,7 @@ const ContactCard = ({onPress, data}) => {
             <Text style={styles.userNameText}>{data.name}</Text>
           </View>
           <View style={styles.statusContainer}>
-            <Text style={styles.statusText}>status</Text>
+            <Text style={styles.statusText}>{DEFAULT_USER_DETAIL.status}</Text>
           </View>
         </View>
       </View>

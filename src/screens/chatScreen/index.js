@@ -1,4 +1,4 @@
-import {View, Text, FlatList} from 'react-native';
+import {View, Text, FlatList, Pressable} from 'react-native';
 import {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
@@ -11,6 +11,8 @@ import {getInitials, sortByTimestamp} from '../../util/helper';
 import database from '@react-native-firebase/database';
 import AuthContext from '../../store/context/authContext';
 import DeleteMessageModal from '../../components/ui/deleteMessageModal';
+import {SCREEN_NAMES} from '../../constants/navigation';
+import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState();
@@ -76,12 +78,16 @@ const ChatScreen = ({navigation, route}) => {
   const users = useSelector(state => state.user.users);
   const userData = users.filter(user => user.number === token)[0];
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
-
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
-  const chatDataArray =
-    userChatList &&
-    sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+  const chatDataArray = () => {
+    if (userChatList !== undefined) {
+      if (Object.keys(users)?.length <= Object.keys(userChatList)?.length) {
+        return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+      }
+    }
+  };
+  chatDataArray();
 
   async function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
@@ -101,7 +107,9 @@ const ChatScreen = ({navigation, route}) => {
 
   function forwardMessageHandler() {
     setSelectedMessage('');
-    navigation.navigate('ForwardMessageScreen', {messageData: selectedMessage});
+    navigation.navigate(SCREEN_NAMES.FORWARD_MESSAGE_SCREEN, {
+      messageData: selectedMessage,
+    });
   }
 
   function replyInChatHandler() {
@@ -129,24 +137,22 @@ const ChatScreen = ({navigation, route}) => {
   function RightHeader({color}) {
     return (
       <View style={[styles.rightHeader, styles.fullHeight]}>
-        <Icon
-          name={'mail-reply'}
-          color={color}
-          size={20}
+        <Pressable
           onPress={replyInChatHandler}
-        />
+          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
+          <Icon name={'mail-reply'} color={color} size={20} />
+        </Pressable>
         <IconButton
           name={'delete'}
           color={color}
           size={24}
           onPress={deleteButtonHandler}
         />
-        <Icon
-          name={'mail-forward'}
-          color={color}
-          size={20}
+        <Pressable
           onPress={forwardMessageHandler}
-        />
+          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
+          <Icon name={'mail-forward'} color={color} size={20} />
+        </Pressable>
       </View>
     );
   }
@@ -193,7 +199,6 @@ const ChatScreen = ({navigation, route}) => {
       };
       setTextMessage('');
       setSelectedMessage('');
-      // setChatReplyActive(false);
       const pushUserData = await database()
         .ref('/users/' + token + '/chats' + '/' + recepientNumber)
         .push({...messageObj});
@@ -225,7 +230,7 @@ const ChatScreen = ({navigation, route}) => {
       )}
       <View style={styles.messageInputContainer}>
         <InputField
-          placeholder={'Type Your Message'}
+          placeholder={INPUT_PLACEHOLDERS.message}
           message={textMessage}
           setTextMessage={setTextMessage}
         />
