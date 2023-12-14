@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -29,11 +29,28 @@ import {
 } from '../../util/helper';
 import {DEFAULT_VALUES} from '../../constants/enums';
 import {SCREEN_NAMES} from '../../constants/navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({navigation, route}) => {
   const [contactNumber, setContactNumber] = useState('');
   const [userName, setUserName] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    const getUserDetails = async () => {
+      const contactNumber = await AsyncStorage.getItem('number');
+      const userName = await AsyncStorage.getItem('name');
+      if (contactNumber !== null) {
+        setContactNumber(contactNumber);
+        setUserName(userName);
+        navigation.navigate(SCREEN_NAMES.OTP_SCREEN, {
+          number: contactNumber,
+          name: userName,
+        });
+      }
+    };
+    getUserDetails();
+  }, []);
 
   function numberHandler(value) {
     const number = extractDigits(value);
@@ -57,6 +74,8 @@ const LoginScreen = ({navigation, route}) => {
         ERROR_MESSAGES.invalid_name,
       );
     } else {
+      AsyncStorage.setItem('number', contactNumber);
+      AsyncStorage.setItem('name', userName);
       navigation.navigate(SCREEN_NAMES.OTP_SCREEN, {
         number: contactNumber,
         name: userName,

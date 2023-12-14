@@ -33,10 +33,12 @@ export const AuthContextProvider = ({children}) => {
     AsyncStorage.setItem('userName', name);
   }
   function logout() {
-    AsyncStorage.setItem('token', '');
-    AsyncStorage.setItem('userName', '');
     setUserName(null);
     setAuthToken(null);
+    AsyncStorage.setItem('token', '');
+    AsyncStorage.setItem('userName', '');
+    AsyncStorage.setItem('number', '');
+    AsyncStorage.setItem('name', '');
   }
 
   const value = {

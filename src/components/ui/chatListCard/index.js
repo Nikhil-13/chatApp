@@ -3,6 +3,8 @@ import React, {useContext} from 'react';
 import {styles} from './styles';
 import {useSelector} from 'react-redux';
 import {DEFAULT_USER_DETAIL} from '../../../constants/strings';
+import IconButton from '../iconButton';
+import {COLORS} from '../../../constants/theme';
 import {
   getInitials,
   timestampToLocal,
@@ -19,6 +21,11 @@ const ChatListCard = ({data, onPress}) => {
   const lastMessage =
     userChatList && sortByTimestamp(Object.entries(userChatList[token])).pop();
 
+  const delMessageIdentifier =
+    lastMessage && lastMessage[1]?.recepientNumber === userId?.number
+      ? 'You deleted this message'
+      : 'This message was deleted';
+
   return (
     <Pressable style={styles.rootContainer} onPress={onPress}>
       <View style={styles.outerContainer}>
@@ -34,7 +41,30 @@ const ChatListCard = ({data, onPress}) => {
           </View>
           <View style={styles.messageDetailContainer}>
             <View style={styles.lastMessageTextContainer}>
-              {lastMessage && lastMessage[1].recepientName === userName ? (
+              {lastMessage &&
+              lastMessage[1]?.isDeleted &&
+              lastMessage[1]?.content === '' ? (
+                <View style={{flexDirection: 'row'}}>
+                  <IconButton name="cancel" size={18} color={COLORS.gray} />
+                  <Text
+                    style={[
+                      styles.chatText,
+                      {
+                        fontStyle: 'italic',
+                        opacity: 0.5,
+                        marginLeft: 4,
+                        color: COLORS.gray,
+                      },
+                    ]}>
+                    {delMessageIdentifier}
+                  </Text>
+                </View>
+              ) : (
+                ''
+              )}
+              {lastMessage &&
+              lastMessage[1]?.recepientName === userName &&
+              !lastMessage[1]?.isDeleted ? (
                 <Text style={styles.lastMessageSenderText}>
                   {DEFAULT_USER_DETAIL.you}
                   {': '}

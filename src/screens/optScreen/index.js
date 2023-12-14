@@ -14,6 +14,7 @@ import {
   NORMAL_TEXTS,
 } from '../../constants/strings';
 import {DEFAULT_VALUES} from '../../constants/enums';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OtpScreen = ({navigation, route}) => {
   let resendCounter = 60;
@@ -50,6 +51,8 @@ const OtpScreen = ({navigation, route}) => {
             authenticate(data.number, data.name.trim());
           }
         });
+      AsyncStorage.setItem('number', '');
+      AsyncStorage.setItem('name', '');
     }
   }, [otp]);
 

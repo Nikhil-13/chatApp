@@ -5,7 +5,12 @@ import FlatButton from '../flatButton';
 import {COLORS} from '../../../constants/theme';
 import {BUTTON_TITLES, HEADERS} from '../../../constants/strings';
 
-function DeleteMessageModal({isModalVisible, setModalVisible, deleteForMe}) {
+function DeleteMessageModal({
+  isModalVisible,
+  setModalVisible,
+  deleteForMe,
+  deleteForEveryOne,
+}) {
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -29,6 +34,7 @@ function DeleteMessageModal({isModalVisible, setModalVisible, deleteForMe}) {
           <FlatButton
             title={BUTTON_TITLES.delete_for_everyone}
             weight={'bold'}
+            onPress={deleteForEveryOne}
             color={COLORS.green_100}
           />
           <FlatButton

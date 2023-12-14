@@ -16,7 +16,7 @@ export const styles = StyleSheet.create({
     columnGap: 10,
     flexDirection: 'row',
     paddingVertical: 4,
-    paddingHorizontal: 10,
+    paddingHorizontal: 4,
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -57,4 +57,27 @@ export const styles = StyleSheet.create({
     marginRight: 5,
   },
   initials: {color: COLORS.black, fontSize: 18},
+  messageInputInnerContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    height: 45,
+    padding: 8,
+    overflow: 'hidden',
+    alignItems: 'center',
+    borderRadius: 20,
+    backgroundColor: COLORS.green_400,
+  },
+
+  inputRightIconsContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  inputLeftIconsContainer: {
+    paddingTop: Platform.select({ios: 2}),
+    alignSelf: 'flex-start',
+    marginLeft: 4,
+  },
 });

@@ -14,9 +14,11 @@ import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState();
-  const [textMessage, setTextMessage] = useState();
+  const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
@@ -33,7 +35,7 @@ const ChatScreen = ({navigation, route}) => {
     if (!!selectedMessage) {
       function backPressHandler() {
         setChatReplyActive(false);
-        setSelectedMessage('');
+        setSelectedMessage(null);
       }
       navigation.setOptions({
         headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
@@ -80,17 +82,23 @@ const ChatScreen = ({navigation, route}) => {
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
-  const chatDataArray = () => {
-    if (userChatList !== undefined) {
-      if (Object.keys(users)?.length <= Object.keys(userChatList)?.length) {
-        return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
-      }
-    }
-  };
-  chatDataArray();
+  const chatDataArray =
+    userChatList &&
+    sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+
+  // const chatDataArray = () => {
+  //   if (userChatList !== undefined) {
+  //     if (Object.keys(users)?.length <= Object.keys(userChatList)?.length) {
+  //       return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+  //     }
+  //   }
+  // };
+  // chatDataArray();
 
   async function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
+    setChatReplyActive(false);
+    setSelectedMessage('');
     const endpoint =
       '/users/' +
       token +
@@ -99,6 +107,57 @@ const ChatScreen = ({navigation, route}) => {
       '/' +
       selectedMessage.messageId;
     const data = await database().ref(endpoint).remove();
+  }
+
+  async function deleteForEveryOneHandler() {
+    const messageTimeStamp = selectedMessage?.messageData?.timestamp;
+    const chatList = users.filter(user => user.number === recepientNumber)[0]
+      ?.chats;
+    const messageArray = Object.entries(chatList[token]);
+    const messageToDelete = messageArray.filter(
+      message => message[1]?.timestamp === messageTimeStamp,
+    );
+    setModalVisible(!isModalVisible);
+    setChatReplyActive(false);
+    setSelectedMessage('');
+
+    if (messageToDelete[0][1]?.recepientNumber !== token) {
+      //for you
+      const endpoint =
+        '/users/' +
+        token +
+        '/chats/' +
+        recepientNumber +
+        '/' +
+        selectedMessage.messageId;
+      if (messageToDelete[0][1]?.isDeleted) {
+        const data = await database().ref(endpoint).remove();
+      } else {
+        database().ref(endpoint).update({
+          isDeleted: true,
+          content: '',
+        });
+      }
+      // for recepient
+      const recepientEndpoint =
+        '/users/' +
+        recepientNumber +
+        '/chats/' +
+        token +
+        '/' +
+        messageToDelete[0][0];
+      if (!messageToDelete[0][1]?.isDeleted) {
+        database().ref(recepientEndpoint).update({
+          isDeleted: true,
+          content: '',
+        });
+      } else if (
+        messageToDelete[0][1]?.isDeleted &&
+        recepientNumber === token
+      ) {
+        const data = await database().ref(recepientEndpoint).remove();
+      }
+    }
   }
 
   function deleteButtonHandler() {
@@ -220,8 +279,8 @@ const ChatScreen = ({navigation, route}) => {
               messageKey={item[0]}
               recepientNumber={recepientNumber}
               userNumber={token}
-              onLongPress={setSelectedMessage}
               messageData={item[1]}
+              setSelectedMessage={setSelectedMessage}
             />
           )}
         />
@@ -229,13 +288,32 @@ const ChatScreen = ({navigation, route}) => {
         <View style={styles.chatContainer}></View>
       )}
       <View style={styles.messageInputContainer}>
-        <InputField
-          placeholder={INPUT_PLACEHOLDERS.message}
-          message={textMessage}
-          setTextMessage={setTextMessage}
-        />
+        <View style={styles.messageInputInnerContainer}>
+          <View style={styles.inputLeftIconsContainer}>
+            <Icon
+              name="smile-o"
+              size={24}
+              color={COLORS.gray}
+              style={styles.fullHeight}
+            />
+          </View>
+          <InputField
+            placeholder={INPUT_PLACEHOLDERS.message}
+            message={textMessage}
+            setTextMessage={setTextMessage}
+          />
+          <View style={styles.inputRightIconsContainer}>
+            <Icon name="paperclip" size={24} color={COLORS.gray} />
+            <Icon
+              name="camera"
+              size={20}
+              color={COLORS.gray}
+              style={[textMessage && {display: 'none'}]}
+            />
+          </View>
+        </View>
         <IconButton
-          name="send"
+          name={textMessage === '' ? 'microphone' : 'send'}
           size={22}
           color={COLORS.white}
           bgColor={COLORS.green_200}
@@ -247,6 +325,7 @@ const ChatScreen = ({navigation, route}) => {
         isModalVisible={isModalVisible}
         setModalVisible={setModalVisible}
         deleteForMe={deleteForMeHandler}
+        deleteForEveryOne={deleteForEveryOneHandler}
       />
     </View>
   );

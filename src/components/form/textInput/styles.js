@@ -1,12 +1,12 @@
-import { StyleSheet } from 'react-native';
-import { COLORS } from '../../../constants/theme';
+import {StyleSheet} from 'react-native';
+import {COLORS} from '../../../constants/theme';
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     height: 45,
     padding: 4,
     overflow: 'hidden',
-    borderRadius: 20,
+    // borderRadius: 20,
     backgroundColor: COLORS.green_400,
   },
   textInput: {
@@ -15,6 +15,6 @@ export const styles = StyleSheet.create({
     color: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
-    height: "100%"
+    height: '100%',
   },
 });

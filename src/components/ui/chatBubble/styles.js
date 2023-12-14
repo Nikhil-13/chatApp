@@ -78,4 +78,19 @@ export const styles = StyleSheet.create({
     color: COLORS.white,
   },
   bar: {backgroundColor: COLORS.green_100, width: 6},
+  bubbleBackdrop: {
+    backgroundColor: COLORS.green_100,
+    opacity: 0.15,
+    height: '90%',
+    width: '100%',
+    position: 'absolute',
+    marginVertical: 2,
+    padding: 4,
+  },
+  deletedText: {
+    fontStyle: 'italic',
+    opacity: 0.5,
+    marginLeft: 4,
+  },
+  deletedMessageRow: {flexDirection: 'row'},
 });
