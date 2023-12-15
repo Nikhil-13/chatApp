@@ -1,4 +1,11 @@
-import {View, Text, FlatList, Pressable} from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import {useState, useEffect, useLayoutEffect, useContext} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
@@ -14,10 +21,8 @@ import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-
 const ChatScreen = ({navigation, route}) => {
-  const [selectedMessage, setSelectedMessage] = useState();
+  const [selectedMessage, setSelectedMessage] = useState([]);
   const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -32,10 +37,10 @@ const ChatScreen = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    if (!!selectedMessage) {
+    if (selectedMessage?.length > 0) {
       function backPressHandler() {
         setChatReplyActive(false);
-        setSelectedMessage(null);
+        setSelectedMessage([]);
       }
       navigation.setOptions({
         headerRight: ({tintColor}) => <RightHeader color={tintColor} />,
@@ -55,6 +60,7 @@ const ChatScreen = ({navigation, route}) => {
         headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
       });
     }
+    // console.log(selectedMessage);
   }, [selectedMessage]);
 
   useEffect(() => {
@@ -82,18 +88,18 @@ const ChatScreen = ({navigation, route}) => {
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
-  const chatDataArray =
-    userChatList &&
-    sortByTimestamp(Object.entries(userChatList[recepientNumber]));
 
-  // const chatDataArray = () => {
-  //   if (userChatList !== undefined) {
-  //     if (Object.keys(users)?.length <= Object.keys(userChatList)?.length) {
-  //       return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
-  //     }
-  //   }
-  // };
-  // chatDataArray();
+  const fetchChatArray = () => {
+    if (userChatList) {
+      if (userChatList[recepientNumber]) {
+        return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+      } else {
+        return [];
+      }
+    }
+  };
+
+  const chatDataArray = fetchChatArray();
 
   async function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
@@ -161,7 +167,8 @@ const ChatScreen = ({navigation, route}) => {
   }
 
   function deleteButtonHandler() {
-    setModalVisible(!isModalVisible);
+    // selectedMessage.forEach(message => console.log(message[0]?.messageData));
+    // setModalVisible(!isModalVisible);
   }
 
   function forwardMessageHandler() {
@@ -196,11 +203,15 @@ const ChatScreen = ({navigation, route}) => {
   function RightHeader({color}) {
     return (
       <View style={[styles.rightHeader, styles.fullHeight]}>
-        <Pressable
-          onPress={replyInChatHandler}
-          hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
-          <Icon name={'mail-reply'} color={color} size={20} />
-        </Pressable>
+        {selectedMessage?.length == 1 ? (
+          <Pressable
+            onPress={replyInChatHandler}
+            hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
+            <Icon name={'mail-reply'} color={color} size={20} />
+          </Pressable>
+        ) : (
+          ''
+        )}
         <IconButton
           name={'delete'}
           color={color}
@@ -268,66 +279,73 @@ const ChatScreen = ({navigation, route}) => {
   }
 
   return (
-    <View style={styles.rootContainer}>
-      {chatDataArray ? (
-        <FlatList
-          style={styles.chatContainer}
-          data={chatDataArray}
-          keyExtractor={item => item[0]}
-          renderItem={({item}) => (
-            <ChatBubble
-              messageKey={item[0]}
-              recepientNumber={recepientNumber}
-              userNumber={token}
-              messageData={item[1]}
-              setSelectedMessage={setSelectedMessage}
-            />
-          )}
-        />
-      ) : (
-        <View style={styles.chatContainer}></View>
-      )}
-      <View style={styles.messageInputContainer}>
-        <View style={styles.messageInputInnerContainer}>
-          <View style={styles.inputLeftIconsContainer}>
-            <Icon
-              name="smile-o"
-              size={24}
-              color={COLORS.gray}
-              style={styles.fullHeight}
-            />
-          </View>
-          <InputField
-            placeholder={INPUT_PLACEHOLDERS.message}
-            message={textMessage}
-            setTextMessage={setTextMessage}
+    <KeyboardAvoidingView
+      behavior={Platform.select({ios: 'padding'})}
+      style={{flex: 1}}
+      keyboardVerticalOffset={80}>
+      <View style={styles.rootContainer}>
+        {chatDataArray ? (
+          <FlatList
+            style={styles.chatContainer}
+            data={chatDataArray}
+            keyExtractor={item => item[0]}
+            renderItem={({item}) => (
+              <ChatBubble
+                messageKey={item[0]}
+                recepientNumber={recepientNumber}
+                userNumber={token}
+                messageData={item[1]}
+                selectedMessage={selectedMessage}
+                setSelectedMessage={setSelectedMessage}
+              />
+            )}
           />
-          <View style={styles.inputRightIconsContainer}>
-            <Icon name="paperclip" size={24} color={COLORS.gray} />
-            <Icon
-              name="camera"
-              size={20}
-              color={COLORS.gray}
-              style={[textMessage && {display: 'none'}]}
-            />
-          </View>
-        </View>
-        <IconButton
-          name={textMessage === '' ? 'microphone' : 'send'}
-          size={22}
-          color={COLORS.white}
-          bgColor={COLORS.green_200}
-          style={styles.sendButton}
-          onPress={chatReplyActive ? sendReply : sendMessage}
+        ) : (
+          <View style={styles.chatContainer}></View>
+        )}
+        <DeleteMessageModal
+          isModalVisible={isModalVisible}
+          setModalVisible={setModalVisible}
+          deleteForMe={deleteForMeHandler}
+          deleteForEveryOne={deleteForEveryOneHandler}
         />
+
+        <View style={styles.messageInputContainer}>
+          <View style={styles.messageInputInnerContainer}>
+            <View style={styles.inputLeftIconsContainer}>
+              <Icon
+                name="smile-o"
+                size={24}
+                color={COLORS.gray}
+                style={styles.fullHeight}
+              />
+            </View>
+            <InputField
+              placeholder={INPUT_PLACEHOLDERS.message}
+              message={textMessage}
+              setTextMessage={setTextMessage}
+            />
+            <View style={styles.inputRightIconsContainer}>
+              <Icon name="paperclip" size={24} color={COLORS.gray} />
+              <Icon
+                name="camera"
+                size={20}
+                color={COLORS.gray}
+                style={[textMessage && {display: 'none'}]}
+              />
+            </View>
+          </View>
+          <IconButton
+            name={textMessage === '' ? 'microphone' : 'send'}
+            size={22}
+            color={COLORS.white}
+            bgColor={COLORS.green_200}
+            style={styles.sendButton}
+            onPress={chatReplyActive ? sendReply : sendMessage}
+          />
+        </View>
       </View>
-      <DeleteMessageModal
-        isModalVisible={isModalVisible}
-        setModalVisible={setModalVisible}
-        deleteForMe={deleteForMeHandler}
-        deleteForEveryOne={deleteForEveryOneHandler}
-      />
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

@@ -1,16 +1,17 @@
+import {useState} from 'react';
 import {View, Text, Pressable} from 'react-native';
-import {COLORS} from '../../../constants/theme';
 import {styles} from './styles';
+import IconButton from '../iconButton';
+import {COLORS} from '../../../constants/theme';
 import {timestampToLocal} from '../../../util/helper';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {useState} from 'react';
-import IconButton from '../iconButton';
 
 const ChatBubble = ({
   userNumber,
   messageKey,
-  setSelectedMessage,
   messageData,
+  selectedMessage,
+  setSelectedMessage,
 }) => {
   const [messageBackdrop, setMessageBackdrop] = useState(false);
   const dir = userNumber === messageData?.recepientNumber ? 'left' : 'right';
@@ -26,7 +27,7 @@ const ChatBubble = ({
   function longPressHandler() {
     const messageObj = {messageId: messageKey, messageData: messageData};
     setMessageBackdrop(true);
-    return setSelectedMessage(messageObj);
+    setSelectedMessage(messages => [...messages, [messageObj]]);
   }
   function onPressHandler() {
     setSelectedMessage(null);

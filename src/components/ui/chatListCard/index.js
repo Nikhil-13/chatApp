@@ -18,8 +18,17 @@ const ChatListCard = ({data, onPress}) => {
   const userId = users.filter(user => user.number === data[0])[0];
   const userName = userId?.name;
   const userChatList = userId?.chats;
-  const lastMessage =
-    userChatList && sortByTimestamp(Object.entries(userChatList[token])).pop();
+  const fetchLastMessage = () => {
+    if (userChatList) {
+      if (userChatList[token]) {
+        return sortByTimestamp(Object.entries(userChatList[token]))?.pop();
+      } else {
+        return null;
+      }
+    }
+  };
+  const lastMessage = fetchLastMessage();
+  // userChatList && sortByTimestamp(Object.entries(userChatList[token])).pop();
 
   const delMessageIdentifier =
     lastMessage && lastMessage[1]?.recepientNumber === userId?.number
@@ -36,7 +45,7 @@ const ChatListCard = ({data, onPress}) => {
           <View style={styles.userDetail}>
             <Text style={styles.userNameText}>{userName}</Text>
             <Text style={styles.messageTime}>
-              {lastMessage && timestampToLocal(lastMessage[1].timestamp)}
+              {lastMessage && timestampToLocal(lastMessage[1]?.timestamp)}
             </Text>
           </View>
           <View style={styles.messageDetailContainer}>
@@ -73,7 +82,7 @@ const ChatListCard = ({data, onPress}) => {
                 ''
               )}
               <Text style={styles.messageText}>
-                {lastMessage && lastMessage[1].content}
+                {lastMessage && lastMessage[1]?.content}
               </Text>
             </View>
           </View>
