@@ -18,6 +18,22 @@ const ChatListCard = ({data, onPress}) => {
   const userId = users.filter(user => user.number === data[0])[0];
   const userName = userId?.name;
   const userChatList = userId?.chats;
+
+  const getUnreadCount = () => {
+    let unreadCounter = 0;
+    if (userChatList) {
+      if (userChatList[token]) {
+        Object.entries(userChatList[token]).forEach(message => {
+          if (message[1]?.status) {
+            unreadCounter++;
+          }
+        });
+      }
+    }
+    return unreadCounter;
+  };
+  const unreadCount = getUnreadCount();
+
   const fetchLastMessage = () => {
     if (userChatList) {
       if (userChatList[token]) {
@@ -27,8 +43,8 @@ const ChatListCard = ({data, onPress}) => {
       }
     }
   };
+
   const lastMessage = fetchLastMessage();
-  // userChatList && sortByTimestamp(Object.entries(userChatList[token])).pop();
 
   const delMessageIdentifier =
     lastMessage && lastMessage[1]?.recepientNumber === userId?.number
@@ -84,6 +100,11 @@ const ChatListCard = ({data, onPress}) => {
               <Text style={styles.messageText}>
                 {lastMessage && lastMessage[1]?.content}
               </Text>
+              {unreadCount && (
+                <View style={styles.unreadCountBadge}>
+                  <Text style={styles.unreadCountText}>{unreadCount}</Text>
+                </View>
+              )}
             </View>
           </View>
         </View>

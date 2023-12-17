@@ -60,7 +60,6 @@ const ChatScreen = ({navigation, route}) => {
         headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
       });
     }
-    // console.log(selectedMessage);
   }, [selectedMessage]);
 
   useEffect(() => {
@@ -100,6 +99,16 @@ const ChatScreen = ({navigation, route}) => {
   };
 
   const chatDataArray = fetchChatArray();
+
+  // async const updateMessageStatus=()=>{
+  //   chatDataArray.forEach(message => console.log(message[0]));
+  //   database()
+  //   .ref('/users/123')
+  //   .update({
+  //     age: 32,
+  //   })
+  //   .then(() => console.log('Data updated.'));
+  // }
 
   async function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
@@ -168,7 +177,7 @@ const ChatScreen = ({navigation, route}) => {
 
   function deleteButtonHandler() {
     // selectedMessage.forEach(message => console.log(message[0]?.messageData));
-    // setModalVisible(!isModalVisible);
+    setModalVisible(!isModalVisible);
   }
 
   function forwardMessageHandler() {
@@ -245,6 +254,7 @@ const ChatScreen = ({navigation, route}) => {
         recepientNumber: recepientNumber,
         content: textMessage,
         timestamp: timeStamp,
+        status: 'sent',
       };
       setTextMessage('');
       const pushUserData = await database()

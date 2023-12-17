@@ -1,5 +1,6 @@
 import React, {useContext} from 'react';
 import {View, Text, StatusBar, StyleSheet} from 'react-native';
+import {useSelector} from 'react-redux';
 
 import TopTabs from '../topTabs';
 import ChatScreen from '../../screens/chatScreen';
@@ -15,11 +16,13 @@ import {COLORS} from '../../constants/theme';
 const Stack = createNativeStackNavigator();
 
 const AuthenticatedStack = () => {
-  const {logout} = useContext(AuthContext);
+  const {token, logout} = useContext(AuthContext);
 
+  const users = useSelector(state => state.user.users);
+  const userName = users.filter(user => user.number === token)[0]?.name;
   function LeftHeader({color}) {
     return (
-      <Text style={[styles.leftHeaderTitle, {color: color}]}>ChatsApp</Text>
+      <Text style={[styles.leftHeaderTitle, {color: color}]}>{userName}</Text>
     );
   }
 

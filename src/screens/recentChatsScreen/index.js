@@ -32,12 +32,11 @@ const RecentChats = ({navigation, route}) => {
   const chatListArray = userChatList && Object.entries(userChatList);
   const everyOneElse = users.filter(user => user.number !== token);
 
-  function openChatHandler(item, list) {
-    // console.log('item', item[0]);
-    // console.log('list', list[0]);
-    // const chatObj = item[0];
-    // navigation.navigate(SCREEN_NAMES.CHAT_SCREEN, {recepient: chatObj});
+  function openChatHandler(item) {
+    const chatObj = users.filter(user => user.number === item[0])[0];
+    navigation.navigate(SCREEN_NAMES.CHAT_SCREEN, {recepient: chatObj});
   }
+
   function newChatHandler() {
     navigation.navigate(SCREEN_NAMES.NEW_CHAT_SCREEN, {userNumber: token});
   }
@@ -51,10 +50,7 @@ const RecentChats = ({navigation, route}) => {
           data={chatListArray}
           alwaysBounceVertical={true}
           renderItem={({item}) => (
-            <ChatListCard
-              data={item}
-              onPress={() => openChatHandler(item, everyOneElse)}
-            />
+            <ChatListCard data={item} onPress={() => openChatHandler(item)} />
           )}
         />
       )}

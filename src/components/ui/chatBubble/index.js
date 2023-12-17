@@ -69,10 +69,15 @@ const ChatBubble = ({
               </Text>
             </View>
           ) : (
-            <Text style={styles.chatText}> {messageData.content}</Text>
+            <Text style={styles.chatText}> {messageData?.content}</Text>
+          )}
+          {messageData?.status === 'sent' ? (
+            <Text style={{color: 'white'}}>sent</Text>
+          ) : (
+            <Text style={{color: 'white'}}>read</Text>
           )}
           <Text style={styles.mesageTime}>
-            {timestampToLocal(messageData.timestamp)}
+            {timestampToLocal(messageData?.timestamp)}
           </Text>
         </View>
         {dir === 'left' ? (
