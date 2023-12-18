@@ -1,15 +1,19 @@
 import {View, TextInput} from 'react-native';
-import React from 'react';
+import React, {forwardRef} from 'react';
 import {styles} from './styles';
 import {COLORS} from '../../../constants/theme';
 
-const InputField = ({placeholder, message, setTextMessage}) => {
+const InputField = forwardRef(function input(
+  {placeholder, message, setTextMessage},
+  ref,
+) {
   function inputHandler(value) {
     setTextMessage(value);
   }
   return (
     <View style={styles.rootContainer}>
       <TextInput
+        ref={ref}
         style={styles.textInput}
         placeholder={placeholder}
         placeholderTextColor={COLORS.gray}
@@ -18,6 +22,6 @@ const InputField = ({placeholder, message, setTextMessage}) => {
       />
     </View>
   );
-};
+});
 
 export default InputField;

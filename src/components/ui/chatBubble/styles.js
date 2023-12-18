@@ -1,6 +1,5 @@
 import {StyleSheet} from 'react-native';
 import {COLORS} from '../../../constants/theme';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 export const styles = StyleSheet.create({
   rootContainer: {
@@ -16,6 +15,7 @@ export const styles = StyleSheet.create({
     gap: 10,
     justifyContent: 'space-between',
     flexDirection: 'row',
+    // borderWidth: 1,
   },
   forwardMessageText: {
     fontSize: 14,
@@ -69,7 +69,8 @@ export const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   replyMessageContainer: {
-    backgroundColor: COLORS.green_450,
+    backgroundColor: COLORS.black,
+    opacity: 0.6,
     flexDirection: 'row',
     borderRadius: 8,
     gap: 5,
@@ -83,7 +84,7 @@ export const styles = StyleSheet.create({
   bubbleBackdrop: {
     backgroundColor: COLORS.green_100,
     opacity: 0.15,
-    height: '90%',
+    height: '100%',
     width: '100%',
     position: 'absolute',
     marginVertical: 2,
@@ -99,7 +100,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 5,
-    marginLeft: 10,
+    // marginLeft: 10,
   },
   messageStatus: {
     alignSelf: 'flex-end',

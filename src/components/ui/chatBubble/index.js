@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {View, Text, Pressable} from 'react-native';
 import {styles} from './styles';
 import IconButton from '../iconButton';
@@ -6,12 +6,15 @@ import {COLORS} from '../../../constants/theme';
 import {timestampToLocal} from '../../../util/helper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import ReplyChatBubble from '../replyChatBubble';
 
 const ChatBubble = ({
   userNumber,
   messageKey,
   messageData,
   selectedMessage,
+  multiSelect,
   setSelectedMessage,
 }) => {
   const [messageBackdrop, setMessageBackdrop] = useState(false);
@@ -19,6 +22,12 @@ const ChatBubble = ({
   const alignDirection = dir === 'left' ? 'flex-start' : 'flex-end';
   const bubbleColor = dir === 'left' ? COLORS.green_400 : COLORS.green_200;
   const arrowDir = dir === 'left';
+
+  useEffect(() => {
+    if (selectedMessage?.length === 0) {
+      setMessageBackdrop(false);
+    }
+  }, [selectedMessage]);
 
   const delMessageIdentifier =
     userNumber !== messageData?.recepientNumber
@@ -52,7 +61,7 @@ const ChatBubble = ({
   }
 
   return (
-    <>
+    <View>
       {messageBackdrop && <View style={styles.bubbleBackdrop}></View>}
       <Pressable
         hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
@@ -70,41 +79,44 @@ const ChatBubble = ({
         )}
 
         {messageData.replyId && !messageData.isDeleted ? (
-          <View style={styles.replyMessageContainer}>
-            <View style={styles.bar}></View>
-            <Text style={styles.replyText}>{messageData.repliedTo}</Text>
-          </View>
+          <ReplyChatBubble messageData={messageData} />
         ) : (
           ''
         )}
+        <View style={{flexDirection: 'row', gap: 5}}>
+          <View style={styles.innerMessageContainer}>
+            {messageData?.isDeleted ? (
+              <View style={styles.deletedMessageRow}>
+                <IconButton name="cancel" size={22} color={COLORS.gray} />
+                <Text style={[styles.chatText, styles.deletedText]}>
+                  {delMessageIdentifier}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.chatText}> {messageData?.content}</Text>
+            )}
+          </View>
 
-        <View style={styles.innerMessageContainer}>
-          {messageData?.isDeleted ? (
-            <View style={styles.deletedMessageRow}>
-              <IconButton name="cancel" size={22} color={COLORS.gray} />
-              <Text style={[styles.chatText, styles.deletedText]}>
-                {delMessageIdentifier}
-              </Text>
-            </View>
-          ) : (
-            <Text style={styles.chatText}> {messageData?.content}</Text>
-          )}
-        </View>
-
-        <View style={styles.messageStatusContainer}>
-          {messageData?.status === 'sent' ? (
-            <FeatherIcon
-              name="check"
-              color={COLORS.gray}
-              size={12}
-              style={styles.messageStatus}
-            />
-          ) : (
-            <IconButton name="check" color={COLORS.blue} size={12} />
-          )}
-          <Text style={styles.mesageTime}>
-            {timestampToLocal(messageData?.timestamp)}
-          </Text>
+          <View style={styles.messageStatusContainer}>
+            <Text style={styles.mesageTime}>
+              {timestampToLocal(messageData?.timestamp)}
+            </Text>
+            {messageData?.status === 'sent' ? (
+              <FeatherIcon
+                name="check"
+                color={COLORS.gray}
+                size={12}
+                style={styles.messageStatus}
+              />
+            ) : (
+              <IonIcon
+                name="checkmark-done"
+                color={COLORS.blue}
+                size={14}
+                style={styles.messageStatus}
+              />
+            )}
+          </View>
         </View>
         {dir === 'left' ? (
           <View
@@ -120,7 +132,7 @@ const ChatBubble = ({
             ]}></View>
         )}
       </Pressable>
-    </>
+    </View>
   );
 };
 

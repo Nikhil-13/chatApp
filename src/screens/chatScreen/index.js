@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useState, useEffect, useLayoutEffect, useContext} from 'react';
+import {useState, useEffect, useLayoutEffect, useContext, useRef} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
 import IconButton from '../../components/ui/iconButton';
@@ -14,19 +14,20 @@ import {useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {styles} from './styles';
 import {COLORS} from '../../constants/theme';
-import {getInitials, sortByTimestamp} from '../../util/helper';
+import {getInitials, sortByTimestamp, timestampToDate} from '../../util/helper';
 import database from '@react-native-firebase/database';
 import AuthContext from '../../store/context/authContext';
 import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import {INPUT_PLACEHOLDERS} from '../../constants/strings';
+import ReplyChatBubble from '../../components/ui/replyChatBubble';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
-  const [multipleSelect, setMultipleSelect] = useState(true);
   const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const messageInputRef = useRef();
 
   const {token} = useContext(AuthContext);
 
@@ -35,6 +36,8 @@ const ChatScreen = ({navigation, route}) => {
       headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
       headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
     });
+    updateStatusUserSide();
+    updateStatusRecepientSide();
   }, []);
 
   useEffect(() => {
@@ -70,6 +73,7 @@ const ChatScreen = ({navigation, route}) => {
         async function forwardMessage() {
           const forwardMessageObj = {
             ...message,
+            //  timeStamp : +new Date(),
             timestamp: new Date().getTime() / 1000,
             recepientName: recepientName,
             recepientNumber: recepientNumber,
@@ -90,6 +94,7 @@ const ChatScreen = ({navigation, route}) => {
   const users = useSelector(state => state.user.users);
   const userData = users.filter(user => user.number === token)[0];
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
+
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
 
@@ -105,10 +110,60 @@ const ChatScreen = ({navigation, route}) => {
 
   const chatDataArray = fetchChatArray();
 
+  const updateStatusUserSide = () => {
+    if (chatDataArray) {
+      let i = chatDataArray?.length;
+      function checkStatus(last) {
+        if (last) {
+          if (last[1]?.status === 'sent') {
+            database()
+              .ref(
+                '/users/' + token + '/chats/' + recepientNumber + '/' + last[0],
+              )
+              .update({
+                status: 'seen',
+              });
+            i--;
+            checkStatus(chatDataArray[i - 1]);
+          }
+        }
+      }
+      checkStatus(chatDataArray[i - 1]);
+    }
+  };
+
+  const updateStatusRecepientSide = () => {
+    const recepientChatData = users.filter(
+      user => user.number === recepientNumber,
+    )[0]?.chats;
+    const chatData = recepientChatData && recepientChatData?.[token];
+    const chatDataArray = chatData && sortByTimestamp(Object.entries(chatData));
+
+    if (!!chatDataArray) {
+      let i = chatDataArray?.length;
+      function checkStatus(last) {
+        if (last) {
+          if (last[1]?.status === 'sent') {
+            database()
+              .ref(
+                '/users/' + recepientNumber + '/chats/' + token + '/' + last[0],
+              )
+              .update({
+                status: 'seen',
+              });
+            i--;
+            checkStatus(chatDataArray[i - 1]);
+          }
+        }
+      }
+      checkStatus(chatDataArray[i - 1]);
+    }
+  };
+
   function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
     setChatReplyActive(false);
-    setSelectedMessage('');
+    setSelectedMessage([]);
     selectedMessage.forEach(async message => {
       const endpoint =
         '/users/' +
@@ -186,6 +241,7 @@ const ChatScreen = ({navigation, route}) => {
   }
 
   function replyInChatHandler() {
+    messageInputRef.current.focus();
     setChatReplyActive(true);
   }
 
@@ -196,7 +252,9 @@ const ChatScreen = ({navigation, route}) => {
           name="arrow-left"
           size={24}
           color={color}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            navigation.goBack();
+          }}
           style={styles.fullHeight}
         />
         <View style={styles.avatarImage}>
@@ -247,6 +305,7 @@ const ChatScreen = ({navigation, route}) => {
   async function sendMessage() {
     if (textMessage !== '') {
       const timeStamp = new Date().getTime() / 1000;
+      // const timeStamp = +new Date();
       const messageObj = {
         recepientName: recepientName,
         recepientNumber: recepientNumber,
@@ -269,7 +328,8 @@ const ChatScreen = ({navigation, route}) => {
     console.log(reply);
     console.log(selectedMessage[0]?.messageId);
     if (textMessage !== '') {
-      const timeStamp = new Date().getTime() / 1000;
+      const timeStamp = +new Date();
+      // const timeStamp = new Date().getTime() / 1000;
       const messageObj = {
         content: textMessage,
         recepientName: recepientName,
@@ -280,7 +340,7 @@ const ChatScreen = ({navigation, route}) => {
         status: 'sent',
       };
       setTextMessage('');
-      setSelectedMessage('');
+      setSelectedMessage([]);
       const pushUserData = await database()
         .ref('/users/' + token + '/chats' + '/' + recepientNumber)
         .push({...messageObj});
@@ -288,6 +348,14 @@ const ChatScreen = ({navigation, route}) => {
         .ref('/users/' + recepientNumber + '/chats' + '/' + token)
         .push({...messageObj});
     }
+  }
+
+  function cancelReplyHanler() {
+    setSelectedMessage('');
+    setChatReplyActive(false);
+  }
+  function getDateBadge(item) {
+    console.log(new Date(item));
   }
 
   return (
@@ -302,14 +370,17 @@ const ChatScreen = ({navigation, route}) => {
             data={chatDataArray}
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
-              <ChatBubble
-                messageKey={item[0]}
-                recepientNumber={recepientNumber}
-                userNumber={token}
-                messageData={item[1]}
-                selectedMessage={selectedMessage}
-                setSelectedMessage={setSelectedMessage}
-              />
+              <>
+                {/* {getDateBadge(item[1]?.timestamp)} */}
+                <ChatBubble
+                  messageKey={item[0]}
+                  recepientNumber={recepientNumber}
+                  userNumber={token}
+                  messageData={item[1]}
+                  selectedMessage={selectedMessage}
+                  setSelectedMessage={setSelectedMessage}
+                />
+              </>
             )}
           />
         ) : (
@@ -322,28 +393,32 @@ const ChatScreen = ({navigation, route}) => {
           deleteForEveryOne={deleteForEveryOneHandler}
         />
 
-        <View>
-          {chatReplyActive && selectedMessage?.length === 1 ? (
-            <Text style={{color: 'red'}}>
-              {selectedMessage[0][0]?.messageData.content}
-            </Text>
-          ) : (
-            ''
-          )}
-          <View style={styles.messageInputContainer}>
+        <View style={styles.messageInputContainer}>
+          <View style={styles.replyItemContainer}>
+            {chatReplyActive && selectedMessage?.length === 1 && (
+              <View style={{padding: 8}}>
+                <ReplyChatBubble
+                  messageData={selectedMessage[0][0]?.messageData}
+                />
+                <Icon
+                  name={'close'}
+                  size={14}
+                  color={COLORS.white}
+                  style={{position: 'absolute', right: 14, top: 10}}
+                  hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
+                  onPress={cancelReplyHanler}
+                />
+              </View>
+            )}
             <View style={styles.messageInputInnerContainer}>
               <View style={styles.inputLeftIconsContainer}>
-                <Icon
-                  name="smile-o"
-                  size={24}
-                  color={COLORS.gray}
-                  style={styles.fullHeight}
-                />
+                <Icon name="smile-o" size={24} color={COLORS.gray} />
               </View>
               <InputField
                 placeholder={INPUT_PLACEHOLDERS.message}
                 message={textMessage}
                 setTextMessage={setTextMessage}
+                ref={messageInputRef}
               />
               <View style={styles.inputRightIconsContainer}>
                 <Icon name="paperclip" size={24} color={COLORS.gray} />
@@ -355,15 +430,15 @@ const ChatScreen = ({navigation, route}) => {
                 />
               </View>
             </View>
-            <IconButton
-              name={textMessage === '' ? 'microphone' : 'send'}
-              size={22}
-              color={COLORS.white}
-              bgColor={COLORS.green_200}
-              style={styles.sendButton}
-              onPress={chatReplyActive ? sendReply : sendMessage}
-            />
           </View>
+          <IconButton
+            name={textMessage === '' ? 'microphone' : 'send'}
+            size={22}
+            color={COLORS.white}
+            bgColor={COLORS.green_200}
+            style={styles.sendButton}
+            onPress={chatReplyActive ? sendReply : sendMessage}
+          />
         </View>
       </View>
     </KeyboardAvoidingView>

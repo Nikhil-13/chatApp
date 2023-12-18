@@ -101,7 +101,7 @@ const ChatListCard = ({data, onPress}) => {
                 ''
               )}
               <Text style={styles.messageText}>
-                {lastMessage && lastMessage[1]?.content.slice(0, 20)}
+                {lastMessage && lastMessage[1]?.content?.slice(0, 20)}
               </Text>
               {!!unreadCount && (
                 <View style={styles.unreadCountBadge}>
