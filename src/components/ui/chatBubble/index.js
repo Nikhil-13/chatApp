@@ -5,6 +5,7 @@ import IconButton from '../iconButton';
 import {COLORS} from '../../../constants/theme';
 import {timestampToLocal} from '../../../util/helper';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 const ChatBubble = ({
   userNumber,
@@ -26,20 +27,37 @@ const ChatBubble = ({
 
   function longPressHandler() {
     const messageObj = {messageId: messageKey, messageData: messageData};
-    setMessageBackdrop(true);
-    setSelectedMessage(messages => [...messages, [messageObj]]);
+    if (!!selectedMessage && selectedMessage?.length === 0) {
+      setMessageBackdrop(true);
+      setSelectedMessage(messages => [...messages, [messageObj]]);
+    }
   }
   function onPressHandler() {
-    setSelectedMessage(null);
-    setMessageBackdrop(!messageBackdrop);
+    const messageObj = {messageId: messageKey, messageData: messageData};
+    if (!!selectedMessage && selectedMessage?.length > 0) {
+      selectedMessage.filter(message => {
+        if (message[0]?.messageId === messageObj?.messageId) {
+          setMessageBackdrop(false);
+          setSelectedMessage(messages =>
+            messages.filter(
+              message => message[0]?.messageId !== messageObj?.messageId,
+            ),
+          );
+        } else {
+          setMessageBackdrop(true);
+          setSelectedMessage(messages => [...messages, [messageObj]]);
+        }
+      });
+    }
   }
 
   return (
     <>
       {messageBackdrop && <View style={styles.bubbleBackdrop}></View>}
       <Pressable
+        hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
         onLongPress={longPressHandler}
-        onPress={messageBackdrop ? onPressHandler : () => {}}
+        onPress={onPressHandler}
         style={[
           styles.rootContainer,
           {alignSelf: alignDirection, backgroundColor: bubbleColor},
@@ -71,10 +89,18 @@ const ChatBubble = ({
           ) : (
             <Text style={styles.chatText}> {messageData?.content}</Text>
           )}
+        </View>
+
+        <View style={styles.messageStatusContainer}>
           {messageData?.status === 'sent' ? (
-            <Text style={{color: 'white'}}>sent</Text>
+            <FeatherIcon
+              name="check"
+              color={COLORS.gray}
+              size={12}
+              style={styles.messageStatus}
+            />
           ) : (
-            <Text style={{color: 'white'}}>read</Text>
+            <IconButton name="check" color={COLORS.blue} size={12} />
           )}
           <Text style={styles.mesageTime}>
             {timestampToLocal(messageData?.timestamp)}

@@ -24,7 +24,10 @@ const ChatListCard = ({data, onPress}) => {
     if (userChatList) {
       if (userChatList[token]) {
         Object.entries(userChatList[token]).forEach(message => {
-          if (message[1]?.status) {
+          if (
+            message[1]?.recepientNumber === token &&
+            message[1]?.status === 'sent'
+          ) {
             unreadCounter++;
           }
         });
@@ -98,9 +101,9 @@ const ChatListCard = ({data, onPress}) => {
                 ''
               )}
               <Text style={styles.messageText}>
-                {lastMessage && lastMessage[1]?.content}
+                {lastMessage && lastMessage[1]?.content.slice(0, 20)}
               </Text>
-              {unreadCount && (
+              {!!unreadCount && (
                 <View style={styles.unreadCountBadge}>
                   <Text style={styles.unreadCountText}>{unreadCount}</Text>
                 </View>

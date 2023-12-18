@@ -11,6 +11,8 @@ export const styles = StyleSheet.create({
     borderRadius: 10,
   },
   innerMessageContainer: {
+    paddingHorizontal: 4,
+    maxWidth: '100%',
     gap: 10,
     justifyContent: 'space-between',
     flexDirection: 'row',
@@ -93,4 +95,13 @@ export const styles = StyleSheet.create({
     marginLeft: 4,
   },
   deletedMessageRow: {flexDirection: 'row'},
+  messageStatusContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 5,
+    marginLeft: 10,
+  },
+  messageStatus: {
+    alignSelf: 'flex-end',
+  },
 });

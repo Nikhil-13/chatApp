@@ -23,6 +23,7 @@ import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
+  const [multipleSelect, setMultipleSelect] = useState(true);
   const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -64,21 +65,25 @@ const ChatScreen = ({navigation, route}) => {
 
   useEffect(() => {
     if (route.params.fowardMessage) {
-      async function forwardMessage() {
-        const forwardMessageObj = {
-          ...route.params.fowardMessage,
-          timestamp: new Date().getTime() / 1000,
-          recepientName: recepientName,
-          recepientNumber: recepientNumber,
-        };
-        const pushUserData = await database()
-          .ref('/users/' + token + '/chats' + '/' + recepientNumber)
-          .push({...forwardMessageObj});
-        const pushRecepientData = await database()
-          .ref('/users/' + recepientNumber + '/chats' + '/' + token)
-          .push({...forwardMessageObj});
-      }
-      forwardMessage();
+      const messagesArray = route.params?.fowardMessage;
+      messagesArray.forEach(message => {
+        async function forwardMessage() {
+          const forwardMessageObj = {
+            ...message,
+            timestamp: new Date().getTime() / 1000,
+            recepientName: recepientName,
+            recepientNumber: recepientNumber,
+            status: 'sent',
+          };
+          const pushUserData = await database()
+            .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+            .push({...forwardMessageObj});
+          const pushRecepientData = await database()
+            .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+            .push({...forwardMessageObj});
+        }
+        forwardMessage();
+      });
     }
   }, [route.params]);
 
@@ -100,83 +105,76 @@ const ChatScreen = ({navigation, route}) => {
 
   const chatDataArray = fetchChatArray();
 
-  // async const updateMessageStatus=()=>{
-  //   chatDataArray.forEach(message => console.log(message[0]));
-  //   database()
-  //   .ref('/users/123')
-  //   .update({
-  //     age: 32,
-  //   })
-  //   .then(() => console.log('Data updated.'));
-  // }
-
-  async function deleteForMeHandler() {
+  function deleteForMeHandler() {
     setModalVisible(!isModalVisible);
     setChatReplyActive(false);
     setSelectedMessage('');
-    const endpoint =
-      '/users/' +
-      token +
-      '/chats/' +
-      recepientNumber +
-      '/' +
-      selectedMessage.messageId;
-    const data = await database().ref(endpoint).remove();
-  }
-
-  async function deleteForEveryOneHandler() {
-    const messageTimeStamp = selectedMessage?.messageData?.timestamp;
-    const chatList = users.filter(user => user.number === recepientNumber)[0]
-      ?.chats;
-    const messageArray = Object.entries(chatList[token]);
-    const messageToDelete = messageArray.filter(
-      message => message[1]?.timestamp === messageTimeStamp,
-    );
-    setModalVisible(!isModalVisible);
-    setChatReplyActive(false);
-    setSelectedMessage('');
-
-    if (messageToDelete[0][1]?.recepientNumber !== token) {
-      //for you
+    selectedMessage.forEach(async message => {
       const endpoint =
         '/users/' +
         token +
         '/chats/' +
         recepientNumber +
         '/' +
-        selectedMessage.messageId;
-      if (messageToDelete[0][1]?.isDeleted) {
-        const data = await database().ref(endpoint).remove();
-      } else {
-        database().ref(endpoint).update({
-          isDeleted: true,
-          content: '',
-        });
+        message[0]?.messageId;
+      const data = await database().ref(endpoint).remove();
+    });
+  }
+
+  function deleteForEveryOneHandler() {
+    selectedMessage.forEach(async message => {
+      const messageTimeStamp = message[0]?.messageData?.timestamp;
+      const chatList = users.filter(user => user.number === recepientNumber)[0]
+        ?.chats;
+      const messageArray = Object.entries(chatList[token]);
+      const messageToDelete = messageArray.filter(
+        message => message[1]?.timestamp === messageTimeStamp,
+      );
+      setModalVisible(!isModalVisible);
+      setChatReplyActive(false);
+      setSelectedMessage([]);
+
+      if (messageToDelete[0][1]?.recepientNumber !== token) {
+        //for you
+        const endpoint =
+          '/users/' +
+          token +
+          '/chats/' +
+          recepientNumber +
+          '/' +
+          message[0]?.messageId;
+        if (messageToDelete[0][1]?.isDeleted) {
+          const data = await database().ref(endpoint).remove();
+        } else {
+          database().ref(endpoint).update({
+            isDeleted: true,
+            content: '',
+          });
+        }
+        // for recepient
+        const recepientEndpoint =
+          '/users/' +
+          recepientNumber +
+          '/chats/' +
+          token +
+          '/' +
+          messageToDelete[0][0];
+        if (!messageToDelete[0][1]?.isDeleted) {
+          database().ref(recepientEndpoint).update({
+            isDeleted: true,
+            content: '',
+          });
+        } else if (
+          messageToDelete[0][1]?.isDeleted &&
+          recepientNumber === token
+        ) {
+          const data = await database().ref(recepientEndpoint).remove();
+        }
       }
-      // for recepient
-      const recepientEndpoint =
-        '/users/' +
-        recepientNumber +
-        '/chats/' +
-        token +
-        '/' +
-        messageToDelete[0][0];
-      if (!messageToDelete[0][1]?.isDeleted) {
-        database().ref(recepientEndpoint).update({
-          isDeleted: true,
-          content: '',
-        });
-      } else if (
-        messageToDelete[0][1]?.isDeleted &&
-        recepientNumber === token
-      ) {
-        const data = await database().ref(recepientEndpoint).remove();
-      }
-    }
+    });
   }
 
   function deleteButtonHandler() {
-    // selectedMessage.forEach(message => console.log(message[0]?.messageData));
     setModalVisible(!isModalVisible);
   }
 
@@ -267,15 +265,19 @@ const ChatScreen = ({navigation, route}) => {
   }
 
   async function sendReply() {
+    const reply = selectedMessage[0][0];
+    console.log(reply);
+    console.log(selectedMessage[0]?.messageId);
     if (textMessage !== '') {
       const timeStamp = new Date().getTime() / 1000;
       const messageObj = {
         content: textMessage,
         recepientName: recepientName,
         recepientNumber: recepientNumber,
-        replyId: selectedMessage.messageId,
+        replyId: reply?.messageId,
         timestamp: timeStamp,
-        repliedTo: selectedMessage.messageData.content,
+        repliedTo: reply.messageData.content,
+        status: 'sent',
       };
       setTextMessage('');
       setSelectedMessage('');
@@ -320,39 +322,48 @@ const ChatScreen = ({navigation, route}) => {
           deleteForEveryOne={deleteForEveryOneHandler}
         />
 
-        <View style={styles.messageInputContainer}>
-          <View style={styles.messageInputInnerContainer}>
-            <View style={styles.inputLeftIconsContainer}>
-              <Icon
-                name="smile-o"
-                size={24}
-                color={COLORS.gray}
-                style={styles.fullHeight}
+        <View>
+          {chatReplyActive && selectedMessage?.length === 1 ? (
+            <Text style={{color: 'red'}}>
+              {selectedMessage[0][0]?.messageData.content}
+            </Text>
+          ) : (
+            ''
+          )}
+          <View style={styles.messageInputContainer}>
+            <View style={styles.messageInputInnerContainer}>
+              <View style={styles.inputLeftIconsContainer}>
+                <Icon
+                  name="smile-o"
+                  size={24}
+                  color={COLORS.gray}
+                  style={styles.fullHeight}
+                />
+              </View>
+              <InputField
+                placeholder={INPUT_PLACEHOLDERS.message}
+                message={textMessage}
+                setTextMessage={setTextMessage}
               />
+              <View style={styles.inputRightIconsContainer}>
+                <Icon name="paperclip" size={24} color={COLORS.gray} />
+                <Icon
+                  name="camera"
+                  size={20}
+                  color={COLORS.gray}
+                  style={[textMessage && {display: 'none'}]}
+                />
+              </View>
             </View>
-            <InputField
-              placeholder={INPUT_PLACEHOLDERS.message}
-              message={textMessage}
-              setTextMessage={setTextMessage}
+            <IconButton
+              name={textMessage === '' ? 'microphone' : 'send'}
+              size={22}
+              color={COLORS.white}
+              bgColor={COLORS.green_200}
+              style={styles.sendButton}
+              onPress={chatReplyActive ? sendReply : sendMessage}
             />
-            <View style={styles.inputRightIconsContainer}>
-              <Icon name="paperclip" size={24} color={COLORS.gray} />
-              <Icon
-                name="camera"
-                size={20}
-                color={COLORS.gray}
-                style={[textMessage && {display: 'none'}]}
-              />
-            </View>
           </View>
-          <IconButton
-            name={textMessage === '' ? 'microphone' : 'send'}
-            size={22}
-            color={COLORS.white}
-            bgColor={COLORS.green_200}
-            style={styles.sendButton}
-            onPress={chatReplyActive ? sendReply : sendMessage}
-          />
         </View>
       </View>
     </KeyboardAvoidingView>

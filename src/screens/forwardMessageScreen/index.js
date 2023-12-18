@@ -17,7 +17,7 @@ const ForwardMessageScreen = ({navigation, route}) => {
     });
   });
 
-  const messageData = route.params?.messageData?.messageData;
+  const messageData = route.params?.messageData;
 
   const users = useSelector(state => state.user.users);
   const userId = users.filter(user => user.number === token)[0];
@@ -27,13 +27,21 @@ const ForwardMessageScreen = ({navigation, route}) => {
   const usersCount = everyOneElse.length;
 
   function forwardMessageHandler(item) {
-    const forwardMessageObj = {
-      content: messageData?.content,
-      isFowarded: true,
-    };
+    const forwardedMessageArray = messageData.map(messages => {
+      return {
+        content: messages[0]?.messageData?.content,
+        isFowarded: true,
+      };
+    });
+
+    // const forwardMessageObj = {
+    //   content: messageData?.content,
+    //   isFowarded: true,
+    // };
+
     navigation.navigate(SCREEN_NAMES.CHAT_SCREEN, {
       recepient: item,
-      fowardMessage: forwardMessageObj,
+      fowardMessage: forwardedMessageArray,
     });
   }
 
