@@ -45,6 +45,7 @@ export const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     right: -8,
     top: 0,
+    zIndex: -2,
   },
   rightMessageArrow: {
     position: 'absolute',
@@ -58,7 +59,7 @@ export const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     left: -8,
     top: 0,
-    zIndex: -1,
+    zIndex: -2,
   },
   mesageTime: {
     fontSize: 11,

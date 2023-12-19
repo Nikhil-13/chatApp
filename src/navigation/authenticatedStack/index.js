@@ -1,6 +1,7 @@
-import React, {useContext} from 'react';
+import React, {useContext, useEffect, useLayoutEffect} from 'react';
 import {View, Text, StatusBar, StyleSheet} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {clearPendingMessages} from '../../store/redux/userSlice';
 
 import TopTabs from '../topTabs';
 import ChatScreen from '../../screens/chatScreen';
@@ -8,18 +9,44 @@ import NewChat from '../../screens/newChatScreen';
 import IconButton from '../../components/ui/iconButton';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import AuthContext from '../../store/context/authContext';
+import database from '@react-native-firebase/database';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ForwardMessageScreen from '../../screens/forwardMessageScreen';
 import {COLORS} from '../../constants/theme';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const Stack = createNativeStackNavigator();
 
 const AuthenticatedStack = () => {
   const {token, logout} = useContext(AuthContext);
-
   const users = useSelector(state => state.user.users);
   const userName = users.filter(user => user.number === token)[0]?.name;
+  const pendingMessages = useSelector(state => state.user.pendingMessages);
+  const {isConnected} = useNetInfo();
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   if (!!pendingMessages) {
+  //     if (isConnected) {
+  //       pendingMessages.forEach(async message => {
+  //         const {recepientNumber} = message[1];
+  //         const messageObj = {
+  //           ...message[1],
+  //           status: 'sent',
+  //         };
+  //         const pushUserData = await database()
+  //           .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+  //           .push({...messageObj});
+  //         const pushRecepientData = await database()
+  //           .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+  //           .push({...messageObj});
+  //       });
+  //     }
+  //   }
+  //   return dispatch(clearPendingMessages());
+  // }, [isConnected]);
+
   function LeftHeader({color}) {
     return (
       <Text style={[styles.leftHeaderTitle, {color: color}]}>{userName}</Text>

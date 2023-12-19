@@ -6,11 +6,20 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useState, useEffect, useLayoutEffect, useContext, useRef} from 'react';
+import SwipeableFlatList from 'rn-gesture-swipeable-flatlist';
+import {addToPendingMessages} from '../../store/redux/userSlice';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useContext,
+  useRef,
+  useMemo,
+} from 'react';
 import ChatBubble from '../../components/ui/chatBubble';
 import InputField from '../../components/form/textInput';
 import IconButton from '../../components/ui/iconButton';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {styles} from './styles';
 import {COLORS} from '../../constants/theme';
@@ -21,7 +30,8 @@ import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 import ReplyChatBubble from '../../components/ui/replyChatBubble';
-import {Swipeable} from 'react-native-gesture-handler';
+import {useNetInfo} from '@react-native-community/netinfo';
+import uuid from 'react-native-uuid';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
@@ -29,6 +39,8 @@ const ChatScreen = ({navigation, route}) => {
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const messageInputRef = useRef();
+  const {isConnected} = useNetInfo();
+  const dispatch = useDispatch();
 
   const {token} = useContext(AuthContext);
 
@@ -74,18 +86,25 @@ const ChatScreen = ({navigation, route}) => {
         async function forwardMessage() {
           const forwardMessageObj = {
             ...message,
-            //  timeStamp : +new Date(),
             timestamp: new Date().getTime() / 1000,
             recepientName: recepientName,
             recepientNumber: recepientNumber,
             status: 'sent',
           };
-          const pushUserData = await database()
-            .ref('/users/' + token + '/chats' + '/' + recepientNumber)
-            .push({...forwardMessageObj});
-          const pushRecepientData = await database()
-            .ref('/users/' + recepientNumber + '/chats' + '/' + token)
-            .push({...forwardMessageObj});
+          if (isConnected) {
+            const pushUserData = await database()
+              .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+              .push({...forwardMessageObj});
+            const pushRecepientData = await database()
+              .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+              .push({...forwardMessageObj});
+          } else {
+            const pendingMessage = [
+              uuid.v4(),
+              {...forwardMessageObj, status: 'pending'},
+            ];
+            dispatch(addToPendingMessages(pendingMessage));
+          }
         }
         forwardMessage();
       });
@@ -95,6 +114,7 @@ const ChatScreen = ({navigation, route}) => {
   const users = useSelector(state => state.user.users);
   const userData = users.filter(user => user.number === token)[0];
   const userChatList = users.filter(user => user.number === token)[0]?.chats;
+  const pendingMessages = useSelector(state => state.user.pendingMessages);
 
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
@@ -102,14 +122,25 @@ const ChatScreen = ({navigation, route}) => {
   const fetchChatArray = () => {
     if (userChatList) {
       if (userChatList[recepientNumber]) {
-        return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+        if (!!pendingMessages && !isConnected) {
+          const wholeDataArray = [
+            ...pendingMessages,
+            ...Object.entries(userChatList[recepientNumber]),
+          ];
+          return sortByTimestamp(wholeDataArray);
+        } else {
+          return sortByTimestamp(Object.entries(userChatList[recepientNumber]));
+        }
       } else {
         return [];
       }
     }
   };
 
-  const chatDataArray = fetchChatArray();
+  const chatDataArray = useMemo(
+    () => fetchChatArray(),
+    [userChatList, pendingMessages],
+  );
 
   const updateStatusUserSide = () => {
     if (chatDataArray) {
@@ -306,7 +337,6 @@ const ChatScreen = ({navigation, route}) => {
   async function sendMessage() {
     if (textMessage !== '') {
       const timeStamp = new Date().getTime() / 1000;
-      // const timeStamp = +new Date();
       const messageObj = {
         recepientName: recepientName,
         recepientNumber: recepientNumber,
@@ -315,22 +345,24 @@ const ChatScreen = ({navigation, route}) => {
         status: 'sent',
       };
       setTextMessage('');
-      const pushUserData = await database()
-        .ref('/users/' + token + '/chats' + '/' + recepientNumber)
-        .push({...messageObj});
-      const pushRecepientData = await database()
-        .ref('/users/' + recepientNumber + '/chats' + '/' + token)
-        .push({...messageObj});
+      if (isConnected) {
+        const pushUserData = await database()
+          .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+          .push({...messageObj});
+        const pushRecepientData = await database()
+          .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+          .push({...messageObj});
+      } else {
+        const pendingMessage = [uuid.v4(), {...messageObj, status: 'pending'}];
+        dispatch(addToPendingMessages(pendingMessage));
+      }
     }
   }
 
   async function sendReply() {
     const reply = selectedMessage[0][0];
-    console.log(reply);
-    console.log(selectedMessage[0]?.messageId);
     if (textMessage !== '') {
-      const timeStamp = +new Date();
-      // const timeStamp = new Date().getTime() / 1000;
+      const timeStamp = new Date().getTime() / 1000;
       const messageObj = {
         content: textMessage,
         recepientName: recepientName,
@@ -342,12 +374,17 @@ const ChatScreen = ({navigation, route}) => {
       };
       setTextMessage('');
       setSelectedMessage([]);
-      const pushUserData = await database()
-        .ref('/users/' + token + '/chats' + '/' + recepientNumber)
-        .push({...messageObj});
-      const pushRecepientData = await database()
-        .ref('/users/' + recepientNumber + '/chats' + '/' + token)
-        .push({...messageObj});
+      if (isConnected) {
+        const pushUserData = await database()
+          .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+          .push({...messageObj});
+        const pushRecepientData = await database()
+          .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+          .push({...messageObj});
+      } else {
+        const pendingMessage = [uuid.v4(), {...messageObj, status: 'pending'}];
+        dispatch(addToPendingMessages(pendingMessage));
+      }
     }
   }
 
@@ -355,12 +392,21 @@ const ChatScreen = ({navigation, route}) => {
     setSelectedMessage('');
     setChatReplyActive(false);
   }
-  // function getDateBadge(item) {
-  //   console.log(new Date(item * 1000));
-  // }
 
-  const leftSwipeComponent = () => {
-    return <Text style={{color: 'red'}}>abc</Text>;
+  const renderLeftActions = item => {
+    // if (selectedMessage?.length <= 1) {
+    //   s;
+    // }
+    // console.log(item);
+    // return (
+    //   <View style={{alignSelf: 'center'}}>
+    //     <Pressable
+    //       onPress={replyInChatHandler}
+    //       hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
+    //       <Icon name={'mail-reply'} color={COLORS.white} size={18} />
+    //     </Pressable>
+    //   </View>
+    // );
   };
 
   return (
@@ -371,21 +417,22 @@ const ChatScreen = ({navigation, route}) => {
       <View style={styles.rootContainer}>
         {chatDataArray ? (
           <FlatList
+            // renderLeftActions={() => renderLeftActions()}
+            // onContentSizeChange={() => FlatList.scrollToEnd({animated: true})}
+            // onLayout={() => FlatList.scrollToEnd({animated: true})}
             style={styles.chatContainer}
             data={chatDataArray}
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
-              <Swipeable renderLeftActions={leftSwipeComponent}>
-                <ChatBubble
-                  messageKey={item[0]}
-                  recepientNumber={recepientNumber}
-                  userNumber={token}
-                  messageData={item[1]}
-                  selectedMessage={selectedMessage}
-                  chatReplyActive={chatReplyActive}
-                  setSelectedMessage={setSelectedMessage}
-                />
-              </Swipeable>
+              <ChatBubble
+                messageKey={item[0]}
+                recepientNumber={recepientNumber}
+                userNumber={token}
+                messageData={item[1]}
+                selectedMessage={selectedMessage}
+                chatReplyActive={chatReplyActive}
+                setSelectedMessage={setSelectedMessage}
+              />
             )}
           />
         ) : (
@@ -396,6 +443,7 @@ const ChatScreen = ({navigation, route}) => {
           setModalVisible={setModalVisible}
           deleteForMe={deleteForMeHandler}
           deleteForEveryOne={deleteForEveryOneHandler}
+          isConnected={isConnected}
         />
 
         <View

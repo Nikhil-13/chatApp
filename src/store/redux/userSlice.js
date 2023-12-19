@@ -17,9 +17,13 @@ const userSlice = createSlice({
     addToPendingMessages: (state, action) => {
       state.pendingMessages.push(action.payload);
     },
+    clearPendingMessages: (state, action) => {
+      state.pendingMessages = [];
+    },
   },
 });
 
-export const {addUsers, addToPendingMessages} = userSlice.actions;
+export const {addUsers, addToPendingMessages, clearPendingMessages} =
+  userSlice.actions;
 export const selectUser = state => state.user.user;
 export default userSlice.reducer;

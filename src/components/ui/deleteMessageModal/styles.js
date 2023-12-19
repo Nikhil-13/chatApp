@@ -19,7 +19,8 @@ export const styles = StyleSheet.create({
   buttonsContainer: {
     flex: 1,
     borderColor: 'white',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    gap: 20,
     paddingVertical: 20,
     paddingHorizontal: 20,
     alignItems: 'flex-end',

@@ -60,6 +60,37 @@ const ChatBubble = ({
     }
   }
 
+  const messageStatus = status => {
+    if (status === 'sent') {
+      return (
+        <FeatherIcon
+          name="check"
+          color={COLORS.gray}
+          size={12}
+          style={styles.messageStatus}
+        />
+      );
+    } else if (status === 'seen') {
+      return (
+        <IonIcon
+          name="checkmark-done"
+          color={COLORS.blue}
+          size={14}
+          style={styles.messageStatus}
+        />
+      );
+    } else if (status === 'pending') {
+      return (
+        <FeatherIcon
+          name="clock"
+          color={COLORS.gray}
+          size={12}
+          style={styles.messageStatus}
+        />
+      );
+    }
+  };
+
   return (
     <Pressable
       hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}
@@ -101,7 +132,8 @@ const ChatBubble = ({
             <Text style={styles.mesageTime}>
               {timestampToLocal(messageData?.timestamp)}
             </Text>
-            {messageData?.status === 'sent' ? (
+            {messageStatus(messageData?.status)}
+            {/* {messageData?.status === 'sent' ? (
               <FeatherIcon
                 name="check"
                 color={COLORS.gray}
@@ -115,7 +147,7 @@ const ChatBubble = ({
                 size={14}
                 style={styles.messageStatus}
               />
-            )}
+            )} */}
           </View>
         </View>
         {dir === 'left' ? (
