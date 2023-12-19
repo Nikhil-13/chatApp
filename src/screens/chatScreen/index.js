@@ -6,7 +6,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import SwipeableFlatList from 'rn-gesture-swipeable-flatlist';
 import {addToPendingMessages} from '../../store/redux/userSlice';
 import {
   useState,
@@ -38,7 +37,9 @@ const ChatScreen = ({navigation, route}) => {
   const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [lastMessageDate, setLastMessageDate] = useState('');
   const messageInputRef = useRef();
+  const flatlistRef = useRef();
   const {isConnected} = useNetInfo();
   const dispatch = useDispatch();
 
@@ -108,6 +109,7 @@ const ChatScreen = ({navigation, route}) => {
         }
         forwardMessage();
       });
+      flatlistRef.current?.scrollToEnd();
     }
   }, [route.params]);
 
@@ -357,6 +359,7 @@ const ChatScreen = ({navigation, route}) => {
         dispatch(addToPendingMessages(pendingMessage));
       }
     }
+    flatlistRef.current?.scrollToEnd();
   }
 
   async function sendReply() {
@@ -386,6 +389,7 @@ const ChatScreen = ({navigation, route}) => {
         dispatch(addToPendingMessages(pendingMessage));
       }
     }
+    flatlistRef.current?.scrollToEnd();
   }
 
   function cancelReplyHanler() {
@@ -393,21 +397,19 @@ const ChatScreen = ({navigation, route}) => {
     setChatReplyActive(false);
   }
 
-  const renderLeftActions = item => {
-    // if (selectedMessage?.length <= 1) {
-    //   s;
-    // }
-    // console.log(item);
-    // return (
-    //   <View style={{alignSelf: 'center'}}>
-    //     <Pressable
-    //       onPress={replyInChatHandler}
-    //       hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}>
-    //       <Icon name={'mail-reply'} color={COLORS.white} size={18} />
-    //     </Pressable>
-    //   </View>
-    // );
-  };
+  // function getDateBadge(date) {
+  //   if (lastMessageDate === '') {
+  //     setLastMessageDate(new Date(date));
+  //   } else {
+  //     if (new Date(date) === lastMessageDate) {
+  //       return null;
+  //     } else {
+  //       setLastMessageDate(new Date(date));
+
+  //       return <Text style={{color: 'red'}}>{date}</Text>;
+  //     }
+  //   }
+  // }
 
   return (
     <KeyboardAvoidingView
@@ -417,22 +419,23 @@ const ChatScreen = ({navigation, route}) => {
       <View style={styles.rootContainer}>
         {chatDataArray ? (
           <FlatList
-            // renderLeftActions={() => renderLeftActions()}
-            // onContentSizeChange={() => FlatList.scrollToEnd({animated: true})}
-            // onLayout={() => FlatList.scrollToEnd({animated: true})}
+            ref={flatlistRef}
             style={styles.chatContainer}
             data={chatDataArray}
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
-              <ChatBubble
-                messageKey={item[0]}
-                recepientNumber={recepientNumber}
-                userNumber={token}
-                messageData={item[1]}
-                selectedMessage={selectedMessage}
-                chatReplyActive={chatReplyActive}
-                setSelectedMessage={setSelectedMessage}
-              />
+              <>
+                {/* {getDateBadge(timestampToDate(item[1]?.timestamp))} */}
+                <ChatBubble
+                  messageKey={item[0]}
+                  recepientNumber={recepientNumber}
+                  userNumber={token}
+                  messageData={item[1]}
+                  selectedMessage={selectedMessage}
+                  chatReplyActive={chatReplyActive}
+                  setSelectedMessage={setSelectedMessage}
+                />
+              </>
             )}
           />
         ) : (

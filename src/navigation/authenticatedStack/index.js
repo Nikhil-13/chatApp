@@ -26,26 +26,26 @@ const AuthenticatedStack = () => {
   const {isConnected} = useNetInfo();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   if (!!pendingMessages) {
-  //     if (isConnected) {
-  //       pendingMessages.forEach(async message => {
-  //         const {recepientNumber} = message[1];
-  //         const messageObj = {
-  //           ...message[1],
-  //           status: 'sent',
-  //         };
-  //         const pushUserData = await database()
-  //           .ref('/users/' + token + '/chats' + '/' + recepientNumber)
-  //           .push({...messageObj});
-  //         const pushRecepientData = await database()
-  //           .ref('/users/' + recepientNumber + '/chats' + '/' + token)
-  //           .push({...messageObj});
-  //       });
-  //     }
-  //   }
-  //   return dispatch(clearPendingMessages());
-  // }, [isConnected]);
+  useEffect(() => {
+    if (!!pendingMessages) {
+      if (isConnected) {
+        pendingMessages.forEach(async message => {
+          const {recepientNumber} = message[1];
+          const messageObj = {
+            ...message[1],
+            status: 'sent',
+          };
+          const pushUserData = await database()
+            .ref('/users/' + token + '/chats' + '/' + recepientNumber)
+            .push({...messageObj});
+          const pushRecepientData = await database()
+            .ref('/users/' + recepientNumber + '/chats' + '/' + token)
+            .push({...messageObj});
+        });
+      }
+    }
+    dispatch(clearPendingMessages());
+  }, [isConnected]);
 
   function LeftHeader({color}) {
     return (

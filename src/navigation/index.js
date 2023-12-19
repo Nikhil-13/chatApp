@@ -4,12 +4,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import AuthContext from '../store/context/authContext';
 import AuthStack from './authStack';
 import AuthenticatedStack from './authenticatedStack';
+import SplashScreen from '../components/ui/splashScreen';
 
 const Navigation = () => {
   const {isAuthenticated, token} = useContext(AuthContext);
 
   if (token === undefined) {
-    return null;
+    return <SplashScreen />;
   }
 
   return (
