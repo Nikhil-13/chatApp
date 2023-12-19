@@ -4,6 +4,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     users: [],
+    pendingMessages: [],
   },
   reducers: {
     addUsers: (state, action) => {
@@ -12,9 +13,13 @@ const userSlice = createSlice({
         state.users.push(action.payload[key]);
       }
     },
+
+    addToPendingMessages: (state, action) => {
+      state.pendingMessages.push(action.payload);
+    },
   },
 });
 
-export const {addUsers} = userSlice.actions;
+export const {addUsers, addToPendingMessages} = userSlice.actions;
 export const selectUser = state => state.user.user;
 export default userSlice.reducer;

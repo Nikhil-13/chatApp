@@ -21,6 +21,7 @@ import DeleteMessageModal from '../../components/ui/deleteMessageModal';
 import {SCREEN_NAMES} from '../../constants/navigation';
 import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 import ReplyChatBubble from '../../components/ui/replyChatBubble';
+import {Swipeable} from 'react-native-gesture-handler';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
@@ -354,9 +355,13 @@ const ChatScreen = ({navigation, route}) => {
     setSelectedMessage('');
     setChatReplyActive(false);
   }
-  function getDateBadge(item) {
-    console.log(new Date(item));
-  }
+  // function getDateBadge(item) {
+  //   console.log(new Date(item * 1000));
+  // }
+
+  const leftSwipeComponent = () => {
+    return <Text style={{color: 'red'}}>abc</Text>;
+  };
 
   return (
     <KeyboardAvoidingView
@@ -370,17 +375,17 @@ const ChatScreen = ({navigation, route}) => {
             data={chatDataArray}
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
-              <>
-                {/* {getDateBadge(item[1]?.timestamp)} */}
+              <Swipeable renderLeftActions={leftSwipeComponent}>
                 <ChatBubble
                   messageKey={item[0]}
                   recepientNumber={recepientNumber}
                   userNumber={token}
                   messageData={item[1]}
                   selectedMessage={selectedMessage}
+                  chatReplyActive={chatReplyActive}
                   setSelectedMessage={setSelectedMessage}
                 />
-              </>
+              </Swipeable>
             )}
           />
         ) : (
@@ -393,7 +398,11 @@ const ChatScreen = ({navigation, route}) => {
           deleteForEveryOne={deleteForEveryOneHandler}
         />
 
-        <View style={styles.messageInputContainer}>
+        <View
+          style={[
+            styles.messageInputContainer,
+            chatReplyActive && {marginBottom: 20},
+          ]}>
           <View style={styles.replyItemContainer}>
             {chatReplyActive && selectedMessage?.length === 1 && (
               <View style={{padding: 8}}>

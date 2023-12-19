@@ -5,17 +5,16 @@ export const styles = StyleSheet.create({
   rootContainer: {
     paddingVertical: 8,
     paddingHorizontal: 5,
-    maxWidth: '75%',
+    maxWidth: '85%',
     margin: 4,
+    marginVertical: 6,
     borderRadius: 10,
   },
   innerMessageContainer: {
     paddingHorizontal: 4,
-    maxWidth: '100%',
+    maxWidth: '80%',
     gap: 10,
-    justifyContent: 'space-between',
     flexDirection: 'row',
-    // borderWidth: 1,
   },
   forwardMessageText: {
     fontSize: 14,
@@ -84,11 +83,12 @@ export const styles = StyleSheet.create({
   bubbleBackdrop: {
     backgroundColor: COLORS.green_100,
     opacity: 0.15,
-    height: '100%',
+    height: '95%',
     width: '100%',
     position: 'absolute',
     marginVertical: 2,
     padding: 4,
+    zIndex: 1,
   },
   deletedText: {
     fontStyle: 'italic',

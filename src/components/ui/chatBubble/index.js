@@ -14,8 +14,8 @@ const ChatBubble = ({
   messageKey,
   messageData,
   selectedMessage,
-  multiSelect,
   setSelectedMessage,
+  chatReplyActive,
 }) => {
   const [messageBackdrop, setMessageBackdrop] = useState(false);
   const dir = userNumber === messageData?.recepientNumber ? 'left' : 'right';
@@ -61,12 +61,12 @@ const ChatBubble = ({
   }
 
   return (
-    <View>
+    <Pressable
+      hitSlop={{left: 10, right: 10, top: 10, bottom: 10}}
+      onLongPress={longPressHandler}
+      onPress={onPressHandler}>
       {messageBackdrop && <View style={styles.bubbleBackdrop}></View>}
-      <Pressable
-        hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
-        onLongPress={longPressHandler}
-        onPress={onPressHandler}
+      <View
         style={[
           styles.rootContainer,
           {alignSelf: alignDirection, backgroundColor: bubbleColor},
@@ -131,8 +131,8 @@ const ChatBubble = ({
               {borderTopColor: COLORS.green_200},
             ]}></View>
         )}
-      </Pressable>
-    </View>
+      </View>
+    </Pressable>
   );
 };
 

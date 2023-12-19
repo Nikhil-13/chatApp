@@ -55,7 +55,10 @@ const ChatListCard = ({data, onPress}) => {
       : 'This message was deleted';
 
   return (
-    <Pressable style={styles.rootContainer} onPress={onPress}>
+    <Pressable
+      style={styles.rootContainer}
+      onPress={onPress}
+      android_ripple={{color: COLORS.green_200}}>
       <View style={styles.outerContainer}>
         <View style={styles.avatarImage}>
           <Text style={styles.initials}>{getInitials(userName)}</Text>
@@ -72,7 +75,10 @@ const ChatListCard = ({data, onPress}) => {
               {lastMessage &&
               lastMessage[1]?.isDeleted &&
               lastMessage[1]?.content === '' ? (
-                <View style={{flexDirection: 'row'}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                  }}>
                   <IconButton name="cancel" size={18} color={COLORS.gray} />
                   <Text
                     style={[
@@ -103,12 +109,12 @@ const ChatListCard = ({data, onPress}) => {
               <Text style={styles.messageText}>
                 {lastMessage && lastMessage[1]?.content?.slice(0, 20)}
               </Text>
-              {!!unreadCount && (
-                <View style={styles.unreadCountBadge}>
-                  <Text style={styles.unreadCountText}>{unreadCount}</Text>
-                </View>
-              )}
             </View>
+            {!!unreadCount && (
+              <View style={styles.unreadCountBadge}>
+                <Text style={styles.unreadCountText}>{unreadCount}</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>

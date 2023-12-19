@@ -44,6 +44,8 @@ export const styles = StyleSheet.create({
     fontSize: 14,
   },
   messageDetailContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     width: '100%',
   },
   messageText: {
@@ -54,15 +56,16 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-  lastMessageTextContainer: {flexDirection: 'row'},
+  lastMessageTextContainer: {
+    flexDirection: 'row',
+  },
   unreadCountBadge: {
     backgroundColor: COLORS.green_200,
-    height: 20,
-    width: 20,
+    height: 18,
+    width: 18,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
   },
   unreadCountText: {color: COLORS.white, fontSize: 10},
 });
