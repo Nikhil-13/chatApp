@@ -5,6 +5,7 @@ const userSlice = createSlice({
   initialState: {
     users: [],
     pendingMessages: [],
+    pendingToDelete: [],
   },
   reducers: {
     addUsers: (state, action) => {
@@ -17,13 +18,24 @@ const userSlice = createSlice({
     addToPendingMessages: (state, action) => {
       state.pendingMessages.push(action.payload);
     },
-    clearPendingMessages: (state, action) => {
+    pendingToDeleteMessages: (state, action) => {
+      state.pendingToDelete.push(action.payload);
+    },
+    clearPendingMessages: state => {
       state.pendingMessages = [];
+    },
+    clearPendingToDeleteMessages: state => {
+      state.pendingToDelete = [];
     },
   },
 });
 
-export const {addUsers, addToPendingMessages, clearPendingMessages} =
-  userSlice.actions;
+export const {
+  addUsers,
+  addToPendingMessages,
+  clearPendingMessages,
+  pendingToDeleteMessages,
+  clearPendingToDeleteMessages,
+} = userSlice.actions;
 export const selectUser = state => state.user.user;
 export default userSlice.reducer;

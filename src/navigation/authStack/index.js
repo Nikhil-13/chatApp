@@ -14,6 +14,8 @@ const AuthStack = () => {
         headerStyle: {backgroundColor: COLORS.green_400},
         cardStyle: {backgroundColor: COLORS.primary_black},
         gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        animation: 'slide_from_right',
       }}>
       <Stack.Screen
         name={SCREEN_NAMES.LOGIN_SCREEN}

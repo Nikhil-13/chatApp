@@ -70,7 +70,7 @@ const ChatBubble = ({
           style={styles.messageStatus}
         />
       );
-    } else if (status === 'seen') {
+    } else if (status === 'seen' && !messageData?.isDeleted) {
       return (
         <IonIcon
           name="checkmark-done"

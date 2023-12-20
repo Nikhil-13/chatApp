@@ -61,7 +61,7 @@ const NewChat = ({navigation, route}) => {
 
   return (
     <View style={styles.rootContainer}>
-      {users.length === 0 ? (
+      {users.length === 1 ? (
         <Text style={styles.noContacts}>{HEADERS.no_contacts}</Text>
       ) : (
         <FlatList

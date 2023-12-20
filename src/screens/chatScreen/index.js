@@ -6,7 +6,10 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {addToPendingMessages} from '../../store/redux/userSlice';
+import {
+  addToPendingMessages,
+  pendingToDeleteMessages,
+} from '../../store/redux/userSlice';
 import {
   useState,
   useEffect,
@@ -31,6 +34,8 @@ import {INPUT_PLACEHOLDERS} from '../../constants/strings';
 import ReplyChatBubble from '../../components/ui/replyChatBubble';
 import {useNetInfo} from '@react-native-community/netinfo';
 import uuid from 'react-native-uuid';
+import DateBadge from '../../components/ui/dateBadge';
+import moment from 'moment';
 
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
@@ -50,6 +55,7 @@ const ChatScreen = ({navigation, route}) => {
       headerLeft: ({tintColor}) => <LeftHeader color={tintColor} />,
       headerRight: ({tintColor}) => <DefaultRightHeader color={tintColor} />,
     });
+    flatlistRef.current?.scrollToEnd();
     updateStatusUserSide();
     updateStatusRecepientSide();
   }, []);
@@ -121,6 +127,9 @@ const ChatScreen = ({navigation, route}) => {
   const recepientName = route.params?.recepient?.name;
   const recepientNumber = route.params?.recepient?.number;
 
+  const recepChatList = users.filter(user => user.number === recepientNumber)[0]
+    ?.chats;
+
   const fetchChatArray = () => {
     if (userChatList) {
       if (userChatList[recepientNumber]) {
@@ -143,6 +152,17 @@ const ChatScreen = ({navigation, route}) => {
     () => fetchChatArray(),
     [userChatList, pendingMessages],
   );
+  useEffect(() => {
+    if (navigation.isFocused()) {
+      updateStatusRecepientSide();
+    }
+  }, [userChatList?.length]);
+
+  useEffect(() => {
+    if (navigation.isFocused()) {
+      updateStatusUserSide();
+    }
+  }, [recepChatList?.length]);
 
   const updateStatusUserSide = () => {
     if (chatDataArray) {
@@ -198,16 +218,34 @@ const ChatScreen = ({navigation, route}) => {
     setModalVisible(!isModalVisible);
     setChatReplyActive(false);
     setSelectedMessage([]);
-    selectedMessage.forEach(async message => {
-      const endpoint =
-        '/users/' +
-        token +
-        '/chats/' +
-        recepientNumber +
-        '/' +
-        message[0]?.messageId;
-      const data = await database().ref(endpoint).remove();
-    });
+    if (isConnected) {
+      selectedMessage.forEach(async message => {
+        const endpoint =
+          '/users/' +
+          token +
+          '/chats/' +
+          recepientNumber +
+          '/' +
+          message[0]?.messageId;
+        const data = await database().ref(endpoint).remove();
+      });
+    } else {
+      selectedMessage.forEach(message => {
+        chatDataArray?.forEach((value, index, arr) => {
+          if (value[0] === message[0]?.messageId) {
+            arr[index] = [
+              value[0],
+              {...value[1], content: '', isDeleted: 'true', status: ''},
+            ];
+          } else {
+            arr[index] = value;
+          }
+        });
+        dispatch(
+          pendingToDeleteMessages([message[0]?.messageId, recepientNumber]),
+        );
+      });
+    }
   }
 
   function deleteForEveryOneHandler() {
@@ -397,19 +435,21 @@ const ChatScreen = ({navigation, route}) => {
     setChatReplyActive(false);
   }
 
-  // function getDateBadge(date) {
-  //   if (lastMessageDate === '') {
-  //     setLastMessageDate(new Date(date));
-  //   } else {
-  //     if (new Date(date) === lastMessageDate) {
-  //       return null;
-  //     } else {
-  //       setLastMessageDate(new Date(date));
-
-  //       return <Text style={{color: 'red'}}>{date}</Text>;
-  //     }
-  //   }
-  // }
+  function getDateBadge(date) {
+    return <DateBadge date={moment('18/12/23', 'DD/MM/YY')} />;
+    if (!!date) {
+      if (lastMessageDate === '') {
+        setLastMessageDate(date);
+      } else {
+        if (date !== lastMessageDate) {
+          setLastMessageDate(date);
+          return <DateBadge date={moment()} />;
+        } else {
+          return <DateBadge date={new Date(date)} />;
+        }
+      }
+    }
+  }
 
   return (
     <KeyboardAvoidingView
@@ -425,7 +465,7 @@ const ChatScreen = ({navigation, route}) => {
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
               <>
-                {/* {getDateBadge(timestampToDate(item[1]?.timestamp))} */}
+                {getDateBadge(timestampToDate(item[1]?.timestamp))}
                 <ChatBubble
                   messageKey={item[0]}
                   recepientNumber={recepientNumber}
@@ -462,7 +502,7 @@ const ChatScreen = ({navigation, route}) => {
                 />
                 <Icon
                   name={'close'}
-                  size={14}
+                  size={16}
                   color={COLORS.white}
                   style={{position: 'absolute', right: 14, top: 10}}
                   hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}

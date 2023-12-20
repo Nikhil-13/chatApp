@@ -17,7 +17,9 @@ const ChatListCard = ({data, onPress}) => {
   const users = useSelector(state => state.user.users);
   const userId = users.filter(user => user.number === data[0])[0];
   const userName = userId?.name;
+  const userNumber = userId?.number;
   const userChatList = userId?.chats;
+  const myChatList = users.filter(user => user.number === token)[0]?.chats;
 
   const getUnreadCount = () => {
     let unreadCounter = 0;
@@ -38,9 +40,9 @@ const ChatListCard = ({data, onPress}) => {
   const unreadCount = getUnreadCount();
 
   const fetchLastMessage = () => {
-    if (userChatList) {
-      if (userChatList[token]) {
-        return sortByTimestamp(Object.entries(userChatList[token]))?.pop();
+    if (myChatList) {
+      if (myChatList[userNumber]) {
+        return sortByTimestamp(Object.entries(myChatList[userNumber]))?.pop();
       } else {
         return null;
       }
@@ -58,7 +60,7 @@ const ChatListCard = ({data, onPress}) => {
     <Pressable
       style={styles.rootContainer}
       onPress={onPress}
-      android_ripple={{color: COLORS.green_200}}>
+      android_ripple={{color: COLORS.gray}}>
       <View style={styles.outerContainer}>
         <View style={styles.avatarImage}>
           <Text style={styles.initials}>{getInitials(userName)}</Text>

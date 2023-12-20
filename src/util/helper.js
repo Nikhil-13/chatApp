@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export function extractDigits(inputString) {
   const regex = /\d/g;
   const digitsArray = inputString.match(regex);
@@ -66,4 +68,20 @@ export function timestampToDate(timestamp) {
   const formattedDate = `${year}-${month}-${day}`;
 
   return formattedDate;
+}
+
+export function formatBadgeDate(date) {
+  const messageDate = moment(date).format('YYYY-MM-DD');
+  const todayWithTime = new Date();
+  const today = moment(todayWithTime).format('YYYY-MM-DD');
+  const yesterdayWithTime = new Date(todayWithTime);
+  yesterdayWithTime.setDate(todayWithTime.getDate() - 1);
+  const yesterday = moment(yesterdayWithTime).format('YYYY-MM-DD');
+  if (messageDate === today) {
+    return 'Today';
+  } else if (messageDate === yesterday) {
+    return 'Yesterday';
+  } else {
+    return moment(messageDate).format('YYYY-MM-DD');
+  }
 }

@@ -1,7 +1,10 @@
 import React, {useContext, useEffect, useLayoutEffect} from 'react';
 import {View, Text, StatusBar, StyleSheet} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {clearPendingMessages} from '../../store/redux/userSlice';
+import {
+  clearPendingMessages,
+  clearPendingToDeleteMessages,
+} from '../../store/redux/userSlice';
 
 import TopTabs from '../topTabs';
 import ChatScreen from '../../screens/chatScreen';
@@ -23,6 +26,7 @@ const AuthenticatedStack = () => {
   const users = useSelector(state => state.user.users);
   const userName = users.filter(user => user.number === token)[0]?.name;
   const pendingMessages = useSelector(state => state.user.pendingMessages);
+  const pendingToDelete = useSelector(state => state.user.pendingToDelete);
   const {isConnected} = useNetInfo();
   const dispatch = useDispatch();
 
@@ -44,7 +48,22 @@ const AuthenticatedStack = () => {
         });
       }
     }
+
+    if (!!pendingToDelete) {
+      if (isConnected) {
+        pendingToDelete.forEach(async data => {
+          const endpoint =
+            '/users/' + token + '/chats/' + data[1] + '/' + data[0];
+          database().ref(endpoint).update({
+            isDeleted: true,
+            content: '',
+            status: '',
+          });
+        });
+      }
+    }
     dispatch(clearPendingMessages());
+    dispatch(clearPendingToDeleteMessages());
   }, [isConnected]);
 
   function LeftHeader({color}) {
@@ -83,8 +102,10 @@ const AuthenticatedStack = () => {
             elevation: 0,
             shadowOpacity: 0,
           },
-          gestureEnabled: true,
           headerTitle: '',
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          animation: 'fade_from_bottom',
         }}>
         <Stack.Screen
           name="tabs"
