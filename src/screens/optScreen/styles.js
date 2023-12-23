@@ -1,13 +1,13 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Platform} from 'react-native';
 import {COLORS} from '../../constants/theme';
 
 export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
-    backgroundColor: COLORS.primary_black,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 40,
+    paddingVertical: Platform.select({ios: 40, android: 20}),
   },
   detailSection: {
     gap: 20,
@@ -15,17 +15,18 @@ export const styles = StyleSheet.create({
   },
   numberInputContainer: {
     flexDirection: 'row',
-    gap: 5,
+    justifyContent: 'center',
+    paddingHorizontal: 15,
     alignItems: 'center',
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderColor: COLORS.green_200,
   },
   numberInput: {
     backgroundColor: 'transparent',
-    color: COLORS.white,
-    padding: 8,
-    width: 30,
+    color: COLORS.black,
+    width: 20,
     fontSize: 20,
+    marginVertical: Platform.select({ios: 6}),
   },
   headerText: {
     color: COLORS.green_100,
@@ -33,9 +34,25 @@ export const styles = StyleSheet.create({
   },
   mutedText: {
     color: COLORS.gray,
-    opacity: 0.7,
   },
   seperator: {
-    marginHorizontal: 10,
+    marginHorizontal: 2,
   },
+  textSection: {
+    paddingHorizontal: 45,
+  },
+  normalText: {
+    flexDirection: 'row',
+    textAlign: 'center',
+    color: COLORS.black,
+    fontSize: 14,
+    gap: 20,
+  },
+  cancelButton: {
+    position: 'absolute',
+
+    top: Platform.select({ios: 1, android: 2}),
+    left: Platform.select({ios: 15, android: 0}),
+  },
+  userNumber: {flexDirection: 'row', alignSelf: 'center'},
 });

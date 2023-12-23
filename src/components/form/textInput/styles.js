@@ -4,16 +4,16 @@ export const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     height: 45,
-    padding: 4,
     overflow: 'hidden',
-    borderRadius: 20,
+    // borderRadius: 20,
     backgroundColor: COLORS.green_400,
   },
   textInput: {
     paddingHorizontal: 6,
-    paddingVertical: 3,
-    fontSize: 16,
+    fontSize: 18,
     color: COLORS.white,
-    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
   },
 });

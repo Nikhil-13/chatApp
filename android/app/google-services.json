@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "319405138488",
+    "firebase_url": "https://chatapp-740c2-default-rtdb.firebaseio.com",
+    "project_id": "chatapp-740c2",
+    "storage_bucket": "chatapp-740c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319405138488:android:918c0cd1c568854163fccd",
+        "android_client_info": {
+          "package_name": "com.chatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN_ngSC0vBKz1FBEzsOul2iM9oCw0_nlU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

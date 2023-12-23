@@ -1,16 +1,15 @@
-import React from 'react';
-import {Image, Pressable} from 'react-native';
-import IonIcon from 'react-native-vector-icons/Ionicons';
-
+import {Pressable} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {styles} from './styles';
 
-const IconButton = ({name, size, color, onPress, bgColor}) => {
-  const containerStyle = {...styles.iconContainer, backgroundColor: bgColor};
+const IconButton = ({name, size, color, onPress, bgColor, style}) => {
+  const containerStyle = {backgroundColor: bgColor, ...style};
   return (
     <Pressable
+      hitSlop={{left: 20, right: 20, top: 20, bottom: 20}}
       style={({pressed}) => [containerStyle, pressed && styles.pressed]}
       onPress={onPress}>
-      <IonIcon name={name} size={size} color={color} />
+      <Icon name={name} size={size} color={color} />
     </Pressable>
   );
 };
