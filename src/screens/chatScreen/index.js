@@ -37,6 +37,8 @@ import uuid from 'react-native-uuid';
 import DateBadge from '../../components/ui/dateBadge';
 import moment from 'moment';
 
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+
 const ChatScreen = ({navigation, route}) => {
   const [selectedMessage, setSelectedMessage] = useState([]);
   const [textMessage, setTextMessage] = useState('');
@@ -61,7 +63,7 @@ const ChatScreen = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    if (selectedMessage?.length > 0) {
+    if (selectedMessage?.length > 0 && chatReplyActive) {
       function backPressHandler() {
         setChatReplyActive(false);
         setSelectedMessage([]);
@@ -415,6 +417,7 @@ const ChatScreen = ({navigation, route}) => {
       };
       setTextMessage('');
       setSelectedMessage([]);
+      setChatReplyActive(false);
       if (isConnected) {
         const pushUserData = await database()
           .ref('/users/' + token + '/chats' + '/' + recepientNumber)
@@ -435,28 +438,28 @@ const ChatScreen = ({navigation, route}) => {
     setChatReplyActive(false);
   }
 
-  function getDateBadge(date) {
-    return <DateBadge date={moment('18/12/23', 'DD/MM/YY')} />;
-    if (!!date) {
-      if (lastMessageDate === '') {
-        setLastMessageDate(date);
-      } else {
-        if (date !== lastMessageDate) {
-          setLastMessageDate(date);
-          return <DateBadge date={moment()} />;
-        } else {
-          return <DateBadge date={new Date(date)} />;
-        }
-      }
-    }
-  }
+  // function getDateBadge(date) {
+  //   return <DateBadge date={moment('18/12/23', 'DD/MM/YY')} />;
+  //   if (!!date) {
+  //     if (lastMessageDate === '') {
+  //       setLastMessageDate(date);
+  //     } else {
+  //       if (date !== lastMessageDate) {
+  //         setLastMessageDate(date);
+  //         return <DateBadge date={moment()} />;
+  //       } else {
+  //         return <DateBadge date={new Date(date)} />;
+  //       }
+  //     }
+  //   }
+  // }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.select({ios: 'padding'})}
       style={{flex: 1}}
       keyboardVerticalOffset={80}>
-      <View style={styles.rootContainer}>
+      <GestureHandlerRootView style={styles.rootContainer}>
         {chatDataArray ? (
           <FlatList
             ref={flatlistRef}
@@ -465,7 +468,7 @@ const ChatScreen = ({navigation, route}) => {
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
               <>
-                {getDateBadge(timestampToDate(item[1]?.timestamp))}
+                {/* {getDateBadge(timestampToDate(item[1]?.timestamp))} */}
                 <ChatBubble
                   messageKey={item[0]}
                   recepientNumber={recepientNumber}
@@ -473,6 +476,8 @@ const ChatScreen = ({navigation, route}) => {
                   messageData={item[1]}
                   selectedMessage={selectedMessage}
                   chatReplyActive={chatReplyActive}
+                  replyInChatHandler={replyInChatHandler}
+                  setChatReplyActive={setChatReplyActive}
                   setSelectedMessage={setSelectedMessage}
                 />
               </>
@@ -540,7 +545,7 @@ const ChatScreen = ({navigation, route}) => {
             onPress={chatReplyActive ? sendReply : sendMessage}
           />
         </View>
-      </View>
+      </GestureHandlerRootView>
     </KeyboardAvoidingView>
   );
 };
