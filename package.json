@@ -10,7 +10,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@codler/react-native-keyboard-aware-scroll-view": "^2.0.1",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/netinfo": "^11.2.1",
     "@react-native-firebase/app": "^18.7.1",
@@ -31,8 +30,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^10.0.2",
-    "react-redux": "^9.0.2",
-    "rn-gesture-swipeable-flatlist": "^1.1.14"
+    "react-redux": "^9.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
