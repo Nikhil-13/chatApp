@@ -44,7 +44,7 @@ const ChatScreen = ({navigation, route}) => {
   const [textMessage, setTextMessage] = useState('');
   const [chatReplyActive, setChatReplyActive] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [lastMessageDate, setLastMessageDate] = useState('');
+  // const [lastMessageDate, setLastMessageDate] = useState('');
   const messageInputRef = useRef();
   const flatlistRef = useRef();
   const {isConnected} = useNetInfo();
@@ -438,21 +438,18 @@ const ChatScreen = ({navigation, route}) => {
     setChatReplyActive(false);
   }
 
-  // function getDateBadge(date) {
-  //   return <DateBadge date={moment('18/12/23', 'DD/MM/YY')} />;
-  //   if (!!date) {
-  //     if (lastMessageDate === '') {
-  //       setLastMessageDate(date);
-  //     } else {
-  //       if (date !== lastMessageDate) {
-  //         setLastMessageDate(date);
-  //         return <DateBadge date={moment()} />;
-  //       } else {
-  //         return <DateBadge date={new Date(date)} />;
-  //       }
-  //     }
-  //   }
-  // }
+  let lastMessageDate = '';
+  function getDateBadge(date) {
+    if (lastMessageDate === '') {
+      lastMessageDate = date;
+      return <DateBadge date={date} />;
+    } else if (lastMessageDate !== date) {
+      lastMessageDate = date;
+      return <DateBadge date={date} />;
+    } else {
+      return null;
+    }
+  }
 
   return (
     <KeyboardAvoidingView
@@ -468,7 +465,7 @@ const ChatScreen = ({navigation, route}) => {
             keyExtractor={item => item[0]}
             renderItem={({item}) => (
               <>
-                {/* {getDateBadge(timestampToDate(item[1]?.timestamp))} */}
+                {getDateBadge(timestampToDate(item[1]?.timestamp))}
                 <ChatBubble
                   messageKey={item[0]}
                   recepientNumber={recepientNumber}

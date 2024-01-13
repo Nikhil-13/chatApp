@@ -21,7 +21,6 @@ const TopTabs = () => {
           borderWidth: 0,
         },
         tabBarContentContainerStyle: {
-          borderWidth: 0,
           height: 40,
         },
         tabBarLabelStyle: {fontWeight: 'bold'},

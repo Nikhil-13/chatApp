@@ -100,7 +100,6 @@ const AuthenticatedStack = () => {
             backgroundColor: COLORS.green_400,
             marginLeft: 50,
             elevation: 0,
-            shadowOpacity: 0,
           },
           headerTitle: '',
           gestureEnabled: true,
